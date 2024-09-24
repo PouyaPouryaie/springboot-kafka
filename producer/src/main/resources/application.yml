@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: producer
+#  kafka:
+#    producer:
+#      bootstrap-servers: 172.21.0.2:9092
+server:
+  port: 9191

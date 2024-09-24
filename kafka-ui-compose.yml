@@ -1,0 +1,26 @@
+services:
+  kafka-ui:
+    container_name: kafka-ui
+    hostname: kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - '8080:8080'
+    volumes:
+      - kafka_ui_storage:/etc/kafkaui
+    environment:
+      DYNAMIC_CONFIG_ENABLED: 'true'
+      LOGGING_LEVEL_ROOT: 'DEBUG'
+    networks:
+      - kafka-docker_default
+
+networks:
+  kafka-docker_default:
+    external: true
+
+volumes:
+  kafka_ui_storage:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '${PWD}/kafka-ui-volume'
