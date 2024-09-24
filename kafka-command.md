@@ -173,6 +173,11 @@ docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-topics.sh \
                 return factory;
             }
         ```
+- Message Routing: 
+    - producer: if you want to send message to specific parition, you need to mention parition number as <br> a parameter at the `send` method of `kafkaTemplate`. <br> 
+    example: send for parition 3 -> `template.send("kafka-topic", 3, null, eventMessageObject)`
+    - consumer: you need to define `topicParitions` at `@kafkaListener` <br>
+    example: read from parition 3 -> `@kafkaListener(topicPartitions = {@TopicPartition(topic = "kafka-topic", partitions = {"2"})})`
 
 
 # Keyword

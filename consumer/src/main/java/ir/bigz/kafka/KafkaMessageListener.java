@@ -4,6 +4,7 @@ import ir.bigz.kafka.dto.Customer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.annotation.TopicPartition;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,6 +16,12 @@ public class KafkaMessageListener {
     @KafkaListener(topics = "kafka-spring-topic")
     public void consume(Customer customer) {
         log.info("Consumer consume the customer: {}", customer);
+    }
+
+    @KafkaListener(topics = "pouya-topic", groupId = "pouya-group",
+            topicPartitions = {@TopicPartition(topic = "pouya-topic", partitions = {"1"})})
+    public void consumeSpecificPartition(String message) {
+        log.info("Consumer consume the message: {}, partition: 1", message);
     }
 
 // for testing

@@ -1,5 +1,6 @@
 package ir.bigz.kafka;
 
+import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -58,5 +59,10 @@ public class KafkaProducerConfig {
     @Bean
     public KafkaTemplate<String, Object> kafkaTemplate(ProducerFactory<String, Object> producerFactory) {
         return new KafkaTemplate<>(producerFactory);
+    }
+
+    @Bean
+    public AdminClient adminClient(KafkaConfigDto kafkaConfigDto) {
+        return AdminClient.create(kafkaConfigDto.propsMap);
     }
 }

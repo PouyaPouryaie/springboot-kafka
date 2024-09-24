@@ -26,6 +26,16 @@ public class EventController {
         }
     }
 
+    @GetMapping("/publish/{partition}/{message}")
+    public ResponseEntity<?> publishMessage(@PathVariable int partition, @PathVariable String message) {
+        try {
+            publisher.sendMessageToSpecificPartition(message, partition);
+            return ResponseEntity.ok("message publish successfully ...");
+        } catch (Exception ex) {
+            return ResponseEntity.internalServerError().body(ex.getMessage());
+        }
+    }
+
     @GetMapping("/publish/bulk/{message}")
     public ResponseEntity<?> publishBulkMessage(@PathVariable String message) {
         try {
