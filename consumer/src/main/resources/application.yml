@@ -1,6 +1,8 @@
 spring:
   application:
     name: consumer
+  profiles:
+    active: production
 #  kafka:
 #    consumer:
 #      bootstrap-servers: 172.21.0.2:9092
