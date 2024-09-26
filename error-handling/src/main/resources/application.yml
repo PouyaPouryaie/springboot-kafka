@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: error-handling
+server:
+  port: 9191
+
+app:
+  topic:
+    name: kafka-error-handle
