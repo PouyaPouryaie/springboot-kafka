@@ -178,6 +178,10 @@ docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-topics.sh \
     example: send for parition 3 -> `template.send("kafka-topic", 3, null, eventMessageObject)`
     - consumer: you need to define `topicParitions` at `@kafkaListener` <br>
     example: read from parition 3 -> `@kafkaListener(topicPartitions = {@TopicPartition(topic = "kafka-topic", partitions = {"2"})})`
+- Retry Strategy:
+    - define a config for kafka Retry and set how many times, the server can send the message before <br> send that message directly to `dead letter topic`  - DLT is a topic that store all the failed message
+    - it helps us to prevent lost message. (reliable message process)
+    - you just need to add `@RetryableTopic` on top of your KafkaListener and also define a method that annotates with `@DltHandler`
 
 
 # Keyword
