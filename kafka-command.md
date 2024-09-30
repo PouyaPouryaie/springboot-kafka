@@ -11,6 +11,13 @@ docker compose -f <docker-compose-file> up -d
 docker exec -it kafka # </bin/sh or bash>
 ```
 
+## UI for Kafka
+Provectus Kafka UI
+```bash
+docker run -it -p 8080:8080 -e DYNAMIC_CONFIG_ENABLED=true provectuslabs/kafka-ui
+```
+- For a successful connection to Kafka Instance, you need to specify the correct hostname (kafka-instance-name) and port (external port)
+
 
 # Kafka CLI Commands With Docker
 
@@ -183,6 +190,20 @@ docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-topics.sh \
     - it helps us to prevent lost message. (reliable message process)
     - you just need to add `@RetryableTopic` on top of your KafkaListener and also define a method that annotates with `@DltHandler`
 
+- Schema Registery (Avro Schema)
+    - to ensure that new data can be consumed by older consumers that were designed to work with the old schema
+    - the requirements which we need are an Avro Maven plugin to define object from Avro Schema file, <br> and Avro Serializer and Deserializer for serialize and deserialize
+    - the schema registery is going to provide a way to store, retrive and evolve schema in a consistent <br> manner between producer and consumer
+    - To check subjects in service registry: http://localhost:8081/subjects
+    - To check entity: http://localhost:8081/subjects/<topic-name>-value/versions/latest
+    - when adding a new field to a schema, you should add a default value for that field in `avsc` file.
+
+
 
 # Keyword
 - Consumer rebalancing
+
+
+# Resource
+- [Kafka-UI](https://docs.kafka-ui.provectus.io/)
+- [Apache Avro](https://avro.apache.org/docs/1.12.0/getting-started-java/)
