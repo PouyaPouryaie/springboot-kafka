@@ -195,7 +195,7 @@ docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-topics.sh \
     - the requirements which we need are an Avro Maven plugin to define object from Avro Schema file, <br> and Avro Serializer and Deserializer for serialize and deserialize
     - the schema registery is going to provide a way to store, retrive and evolve schema in a consistent <br> manner between producer and consumer
     - To check subjects in service registry: http://localhost:8081/subjects
-    - To check entity: http://localhost:8081/subjects/<topic-name>-value/versions/latest
+    - To check entity: `http://localhost:8081/subjects/<topic-name>-value/versions/latest`
     - when adding a new field to a schema, you should add a default value for that field in `avsc` file.
 
 
