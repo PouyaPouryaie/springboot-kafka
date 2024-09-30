@@ -21,7 +21,7 @@ services:
       - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true # Creating topic if the topic does not exist
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
       - ALLOW_PLAINTEXT_LISTENER=yes
-    network:
+    networks:
       - kafka-docker_default
 
 volumes:
