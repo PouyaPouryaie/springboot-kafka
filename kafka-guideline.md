@@ -99,19 +99,22 @@ docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-topics.sh \
 
 # Springboot & Kafka
 
-- The spring application is abled to create a new topic for you with default config (partition 1, replication 0),<br> when a message and topicName send to kafka with `kafkaTemplate`
-- Create Topic Programmatically: define bean from NewTopic and set name, partition, and replication for the topic
+- The Spring application is capable of dynamically provisioning new Kafka topics with default configurations (partition 1, replication 0),<br> this action happens when a message and topicName send to kafka with `kafkaTemplate`
+- Create Topic Programmatically: defining a bean from NewTopic and set name, partition, and replication for the topic
 - For consuming, you should define a group for consumer
     - by annotation: `@KafkaListener(topics = "kafka-spring-topic", groupId = "spring-group")`
+      - This annotation could be used on top of class or method
+      - Class-level annotation is suitable when you want to group related message handling logic together. <br> Messages from these topics will be distributed to the methods within the class based on their parameters
     - by properties: `kafka.consumer.group-id=spring-group`
-- If you create just one instance for consume data. the consumer will connect to all the partitions of the topic
-- Assign partitions to the multi consumer is managed by kafka by default, so it choose which partition connect <br> to which consumer
-- For test, we can define multi method instead of multi instance to connect to kafka and check it
-- If the number of consumers in the group is more than the number of partitions, some of the consumers are ideal <br> and won't be used until one of the other consumers is corrupted
+- If you create just one instance for consuming data. the consumer will connect to all the partitions of that topic
+- Assigning partitions to the multi consumer is managed by kafka by default, so it choose which partition connect <br> to which consumer
+- If the number of consumers in the group is more than the number of partitions, some of the consumers are going to move to ideal state <br> and won't be used until one of the other consumers is corrupted
 - If during the process, the consumer is dead, we will have Lag, and we need to republish Lag data to consumer <br> after it is lived
 - Serialize & Deserialize
-    - if you want to send custome object (DTO), you need to define either serializer at producer and deserializer at consumer side
-    - the trusted package path at consumer should be the same path package at producer
+    - If you want to send Java object (DTO), you need to define both serializer at producer and deserializer at consumer side
+      - Your Java Objects should be followed Pojo structure (Getter, Setter, No Args Constructor, All Args Constructor)
+    - For handle deserialization errors, you can use `ErrorHandlingDeserializer`, which is provided by spring. <br> it is a wrapper around your custom deserializer 
+    - The trusted package path at consumer should be the same path package at producer
     1) Use Properties file
         - Example
         ```yml
@@ -137,7 +140,7 @@ docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-topics.sh \
     2) Use Java Config Class
         - Example
         ```java
-        # Producer
+        // Producer
             @Bean
             public Map<String, Object> producerConfigs() {
                 Map<String, Object> props = new HashMap<>();
@@ -156,7 +159,7 @@ docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-topics.sh \
             public KafkaTemplate<String, Object> kafkaTemplate() {
                 return new KafkaTemplate<>(producerFactory());
             }
-        # Consumer
+        // Consumer
             @Bean
             public Map<String, Object> consumerConfigs() {
                 Map<String, Object> props = new HashMap<>();
@@ -181,14 +184,14 @@ docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-topics.sh \
             }
         ```
 - Message Routing: 
-    - producer: if you want to send message to specific parition, you need to mention parition number as <br> a parameter at the `send` method of `kafkaTemplate`. <br> 
-    example: send for parition 3 -> `template.send("kafka-topic", 3, null, eventMessageObject)`
-    - consumer: you need to define `topicParitions` at `@kafkaListener` <br>
-    example: read from parition 3 -> `@kafkaListener(topicPartitions = {@TopicPartition(topic = "kafka-topic", partitions = {"2"})})`
+    - Producer: if you want to send message to the specific partition, you need to mention that partition number as <br> a parameter at the `send` method of `kafkaTemplate`. <br> 
+    example: send for partition 3 -> `template.send("kafka-topic", 3, null, eventMessageObject)`
+    - consumer: you need to define `topicPartitions` at `@kafkaListener` <br>
+    example: read from partition 3 -> `@kafkaListener(topicPartitions = {@TopicPartition(topic = "kafka-topic", partitions = {"2"})})`
 - Retry Strategy:
-    - define a config for kafka Retry and set how many times, the server can send the message before <br> send that message directly to `dead letter topic`  - DLT is a topic that store all the failed message
-    - it helps us to prevent lost message. (reliable message process)
-    - you just need to add `@RetryableTopic` on top of your KafkaListener and also define a method that annotates with `@DltHandler`
+    - Establish a retry mechanism for Kafka messages. Define the maximum number of retries before routing undeliverable <br> messages to the `Dead Letter Topic` (DLT is a topic that store all the failed message)
+    - It prevents lost message. (reliable message process)
+    - You just need to add `@RetryableTopic` on top of your KafkaListener and also define a method that annotates with `@DltHandler`
 
 - Schema Registery (Avro Schema)
     - to ensure that new data can be consumed by older consumers that were designed to work with the old schema
@@ -199,6 +202,9 @@ docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-topics.sh \
     - when adding a new field to a schema, you should add a default value for that field in `avsc` file.
 
 
+
+## Hints
+- For test consumer part, you can define multi method instead of multi instance to connect to kafka 
 
 # Keyword
 - Consumer rebalancing
