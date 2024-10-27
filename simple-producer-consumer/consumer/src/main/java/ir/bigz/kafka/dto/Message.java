@@ -1,0 +1,24 @@
+package ir.bigz.kafka.dto;
+import lombok.Data;
+
+import java.util.UUID;
+
+@Data
+public class Message<T> {
+
+    UUID messageId;
+    T message;
+
+    public Message(T message) {
+        messageId = UUID.randomUUID();
+        this.message = message;
+    }
+
+    public Message() {
+    }
+
+    public Message(UUID messageId, T message) {
+        this.messageId = messageId;
+        this.message = message;
+    }
+}

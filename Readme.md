@@ -19,19 +19,23 @@ To run this project, ensure you have Docker and Docker Compose installed on your
 - Docker Compose
 
 ### Instructions:
-- find command in `kafka-command.md` file
-- use `kafka-service-registry-compose.yml` to test schema registry
-- also there are compose file related to run kafka and kafka-ui
+- There is some guideLines, hints and command that you need to know to how to use kafka and which options provide by Spring team
+  The name of document is `kafka-guideline.md`
+- Also, There are few Docker composer that prepare to run Kafka and Kafka-UI at your local machine
+  - use `kafka-compose.yml` to run kafka on your local machine 
+  - use `kafka-service-registry-compose.yml` to test schema registry
+  - use `kafka-ui-compose.yml` to run Kafka-ui 
+    - For more information -> [UI for Apache Kafka](https://github.com/provectus/kafka-ui)
+- For Testing, you can find a simple setup that show how to use `Testcontainer` for test Kafka. you can find it at `simple-producer-consumer` Project
 
 ### Exploring the Project
 
 The project demonstrates essential Kafka functionalities through code examples:
 
-**producer**: demonstrating how to send messages to Kafka topics.
-**consumer**: demonstrating how to receive and process messages from Kafka topics.
-**error-handling**: Implemented within the producer and consumer to manage potential errors and ensure message delivery. also show how to use Retry Strategy 
-**serivce-registry**: Integrated for efficient data serialization and centralized schema management by using Avro and schema registry
-**testcontainer**: demonstrating how to use testcontainer to test producer and consumer. you can find it under `src/test/java/ir/bigz/kafka` package in consumer and producer module
+**Simple Producer-Consumer**: demonstrating how to send and receive messages from/to Kafka topics with basic configuration.
+**Error Handling**: Implemented within the producer and consumer to manage potential errors and ensure message delivery. also show how to use Retry Strategy
+**Service Registry (Avro)**: Integrated for efficient data serialization and centralized schema management by using Avro and schema registry
+**Testcontainer**: demonstrating how to use Testcontainer to test producer and consumer. you can find it under `src/test/java/ir/bigz/kafka` package in consumer and producer module
 
 ### Contributing
 
