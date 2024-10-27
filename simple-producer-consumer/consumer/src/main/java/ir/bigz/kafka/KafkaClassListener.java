@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import java.util.Random;
 
 @Component
-@KafkaListener(topics = "customer-message", groupId = "pouya-group")
+@KafkaListener(topics = "message-topic", groupId = "pouya-group")
 public class KafkaClassListener {
 
     private final Logger log = LoggerFactory.getLogger(KafkaClassListener.class);

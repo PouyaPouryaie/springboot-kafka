@@ -17,24 +17,28 @@ public class KafkaMethodListener {
 
     private CountDownLatch latch = new CountDownLatch(1);
 
-//    @KafkaListener(topics = "kafka-spring-topic", groupId = "spring-group-1")
-    @KafkaListener(topics = "kafka-spring-topic")
+    @KafkaListener(topics = "customer-topic")
     public void consume(Customer customer) {
         log.info("Consumer consume the customer: {}", customer);
         latch.countDown();
     }
 
-//    @KafkaListener(topics = "pouya-topic", groupId = "pouya-group",
-//            topicPartitions = {@TopicPartition(topic = "pouya-topic", partitions = {"1"})})
-    @KafkaListener(topics = "pouya-topic", groupId = "pouya-group",
-            topicPartitions = {@TopicPartition(topic = "pouya-topic",
-                    partitionOffsets = { @PartitionOffset(partition = "1", initialOffset = "0")})})
-    public void consumeSpecificPartition(String message) {
-        log.info("Consumer consume the message: {}, partition: 1", message);
+    @KafkaListener(topics = "spring-topic-string", groupId = "pouya-group",
+            topicPartitions = {@TopicPartition(topic = "spring-topic-string",
+                    partitionOffsets = { @PartitionOffset(partition = "0", initialOffset = "0")})})
+    public void consumeSpecificPartitionFromBeginning(String message) {
+        log.info("Consumer From Beginning consume the message: {}, partition: 0", message);
         latch.countDown();
     }
 
-// for testing
+    @KafkaListener(topics = "pouya-topic-string", groupId = "pouya-group",
+        topicPartitions = {@TopicPartition(topic = "pouya-topic-string", partitions = {"1"})})
+    public void consumeSpecificPartition(String message) {
+        log.info("Consumer consume the message: {}, from partition: 1", message);
+        latch.countDown();
+    }
+
+// To testing, you can define multiple method that listen to specific topic and show you mimic of working as different instance in group consuming
 //    @KafkaListener(topics = "kafka-spring-topic")
 //    public void consumeTwo(String message) {
 //        log.info("Consumer 2 consume the message: {}", message);
