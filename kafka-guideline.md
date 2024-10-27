@@ -192,7 +192,6 @@ docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-topics.sh \
     - Establish a retry mechanism for Kafka messages. Define the maximum number of retries before routing undeliverable <br> messages to the `Dead Letter Topic` (DLT is a topic that store all the failed message)
     - It prevents lost message. (reliable message process)
     - You just need to add `@RetryableTopic` on top of your KafkaListener and also define a method that annotates with `@DltHandler`
-
 - Schema Registery (Avro Schema)
     - to ensure that new data can be consumed by older consumers that were designed to work with the old schema
     - the requirements which we need are an Avro Maven plugin to define object from Avro Schema file, <br> and Avro Serializer and Deserializer for serialize and deserialize
@@ -200,6 +199,48 @@ docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-topics.sh \
     - To check subjects in service registry: http://localhost:8081/subjects
     - To check entity: `http://localhost:8081/subjects/<topic-name>-value/versions/latest`
     - when adding a new field to a schema, you should add a default value for that field in `avsc` file.
+- RoutingKafkaTemplate
+    - using RoutingKafkaTemplate to serialize data based on different topic name
+    - you need to define a bean to return `Map<Pattern, ProducerFactory<Object, Object>>` which is contains different type of <br> DefaultKafkaProducerFactory based on Pattern that you are defined like `Pattern.compile("message-.*")`
+    - then initialize a new RoutingKafkaTemplate with value of `Map<Pattern, ProducerFactory<Object, Object>>`
+    ```Java
+        @Bean
+    public KafkaConfigDto kafkaConfigDto() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "172.21.0.3:9092");
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        return new KafkaConfigDto(props);
+    }
+
+    @Bean
+    public ProducerFactory<Object, Object> defaultProducerFactory(KafkaConfigDto kafkaConfigDto) {
+        return new DefaultKafkaProducerFactory<>(kafkaConfigDto.getPropsMap());
+    }
+
+    @Bean
+    public Map<Pattern, ProducerFactory<Object, Object>> producerFactories(ProducerFactory<Object, Object> defaultProducerFactory) {
+        Map<Pattern, ProducerFactory<Object, Object>> factories = new HashMap<>();
+
+        // Create a default ProducerFactory for general usage which is producer string
+        factories.put(Pattern.compile(".*-string"), defaultProducerFactory);
+
+        // ProducerFactory with Json serializer
+        Map<String, Object> props = new HashMap<>();
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "172.21.0.3:9092");
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        DefaultKafkaProducerFactory<Object, Object> jsonProducerFactory = new DefaultKafkaProducerFactory<>(props);
+        factories.put(Pattern.compile("message-.*"), jsonProducerFactory);
+
+        return factories;
+    }
+
+    @Bean
+    public RoutingKafkaTemplate routingTemplate(Map<Pattern, ProducerFactory<Object, Object>> producerFactories) {
+        return new RoutingKafkaTemplate(producerFactories);
+    }
+    ```
 
 
 

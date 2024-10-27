@@ -2,7 +2,6 @@ package ir.bigz.kafka;
 
 import ir.bigz.kafka.dto.Message;
 import ir.bigz.kafka.dto.Purchase;
-import org.apache.kafka.clients.admin.AdminClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -19,11 +18,9 @@ public class KafkaMessagePublisher {
 
     // to communicate with kafka we need to use kafkaTemplate class
     private final KafkaTemplate<String, Object> template;
-    private final AdminClient adminClient;
 
-    public KafkaMessagePublisher(KafkaTemplate<String, Object> template, AdminClient adminClient) {
+    public KafkaMessagePublisher(KafkaTemplate<String, Object> template) {
         this.template = template;
-        this.adminClient = adminClient;
     }
 
     public void sendMessageToTopic(UUID messageUUID, Purchase purchase) {
