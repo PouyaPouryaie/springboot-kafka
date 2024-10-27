@@ -22,7 +22,7 @@ services:
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
       - ALLOW_PLAINTEXT_LISTENER=yes
     networks:
-      - kafka-docker_default
+      - kafka-network
 
 volumes:
   kafka_storage:
@@ -34,5 +34,6 @@ volumes:
 
 
 networks:
-  kafka-docker_default:
+  kafka-network:
+    name: kafka-network
     driver: bridge
