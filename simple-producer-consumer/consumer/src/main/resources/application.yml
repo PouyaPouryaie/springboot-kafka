@@ -17,3 +17,8 @@ spring:
 
 server:
   port: 9292
+logging:
+  level:
+    root: WARN
+    org.springframework.web: INFO
+    ir.bigz.kafka: INFO

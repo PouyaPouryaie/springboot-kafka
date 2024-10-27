@@ -7,6 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.messaging.MessageHeaders;
+import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
@@ -24,8 +26,9 @@ public class KafkaClassListener {
     }
 
     @KafkaHandler
-    public void consumeMessage(@Payload Message<Customer> message) {
+    public void consumeMessage(@Payload Message<Customer> message, @Headers MessageHeaders headers) {
         log.info("Consumer consume the message payload: {}", message.toString());
+        headers.keySet().forEach(key -> log.info("{}:{}", key, headers.get(key)));
         Random random = new Random();
         int randomNum = random.nextInt(1000 - 1 + 1) + 1;
         long randomPrice = random.nextInt(10_000 - 1_00 + 1);

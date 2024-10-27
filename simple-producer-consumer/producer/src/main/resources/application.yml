@@ -8,3 +8,8 @@ spring:
 #      bootstrap-servers: 172.21.0.2:9092
 server:
   port: 9191
+logging:
+  level:
+    root: WARN
+    org.springframework.web: INFO
+    ir.bigz.kafka: INFO
