@@ -7,9 +7,7 @@ import org.apache.kafka.clients.admin.ListTopicsOptions;
 import org.apache.kafka.common.TopicPartitionInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.core.RoutingKafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 
@@ -23,16 +21,16 @@ public class KafkaMessagePublisher {
     Logger log = LoggerFactory.getLogger(KafkaMessagePublisher.class);
 
     // to communicate with kafka we need to use kafkaTemplate class
-    private final RoutingKafkaTemplate template;
+    private final KafkaTemplate<String, Object> template;
     private final AdminClient adminClient;
 
-    public KafkaMessagePublisher(RoutingKafkaTemplate template, AdminClient adminClient) {
+    public KafkaMessagePublisher(KafkaTemplate<String, Object> template, AdminClient adminClient) {
         this.template = template;
         this.adminClient = adminClient;
     }
 
     public void sendMessageToTopic(String message) {
-        CompletableFuture<SendResult<Object, Object>> future = template.send("spring-topic-string", message);
+        CompletableFuture<SendResult<String, Object>> future = template.send("message-string-topic", message);
         future.whenComplete((result, ex) -> {
             if (ex == null) {
                 log.info("Sent Message={} with offset={}", message, result.getRecordMetadata().offset());
@@ -43,8 +41,8 @@ public class KafkaMessagePublisher {
     }
 
     public void sendMessageToSpecificPartition(String message, int partition) {
-        if(partitionExists("pouya-topic", partition)) {
-            CompletableFuture<SendResult<Object, Object>> future = template.send("pouya-topic-string", partition, null, message);
+        if(partitionExists("message-string-topic", partition)) {
+            CompletableFuture<SendResult<String, Object>> future = template.send("message-string-topic", partition, null, message);
             future.whenComplete((result, ex) -> {
                 if (ex == null) {
                     log.info("Sent Message={} with offset={} to partition={}", message, result.getRecordMetadata().offset(), partition);
@@ -59,20 +57,9 @@ public class KafkaMessagePublisher {
 
     }
 
-    public void sendEventToTopic(Customer customer) {
-        CompletableFuture<SendResult<Object, Object>> future = template.send("customer-topic", customer);
-        future.whenComplete((result, ex) -> {
-            if (ex == null) {
-                log.info("Sent Customer={} with offset={}", customer.toString(), result.getRecordMetadata().offset());
-            } else {
-                log.error("Unable to send Customer={} due to {}", customer.toString(), ex.getMessage());
-            }
-        });
-    }
-
     public void sendMessageToTopic(Customer customer) {
         var customerMessage = new Message<>(customer);
-        CompletableFuture<SendResult<Object, Object>> future = template.send("message-topic", customerMessage);
+        CompletableFuture<SendResult<String, Object>> future = template.send("message-customer-topic", customerMessage);
         future.whenComplete((result, ex) -> {
             if (ex == null) {
                 log.info("Sent Message={} with offset={}", customerMessage, result.getRecordMetadata().offset());

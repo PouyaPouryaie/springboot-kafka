@@ -1,6 +1,7 @@
 package ir.bigz.kafka;
 
 import ir.bigz.kafka.dto.Customer;
+import ir.bigz.kafka.dto.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -17,22 +18,22 @@ public class KafkaMethodListener {
 
     private CountDownLatch latch = new CountDownLatch(1);
 
-    @KafkaListener(topics = "customer-topic")
-    public void consume(Customer customer) {
+    @KafkaListener(topics = "message-customer-topic")
+    public void consume(Message<Customer> customer) {
         log.info("Consumer consume the customer: {}", customer);
         latch.countDown();
     }
 
-    @KafkaListener(topics = "spring-topic-string", groupId = "pouya-group",
-            topicPartitions = {@TopicPartition(topic = "spring-topic-string",
+    @KafkaListener(topics = "message-string-topic", groupId = "method-listener-group",
+            topicPartitions = {@TopicPartition(topic = "message-string-topic",
                     partitionOffsets = { @PartitionOffset(partition = "0", initialOffset = "0")})})
     public void consumeSpecificPartitionFromBeginning(String message) {
         log.info("Consumer From Beginning consume the message: {}, partition: 0", message);
         latch.countDown();
     }
 
-    @KafkaListener(topics = "pouya-topic-string", groupId = "pouya-group",
-        topicPartitions = {@TopicPartition(topic = "pouya-topic-string", partitions = {"1"})})
+    @KafkaListener(topics = "message-string-topic", groupId = "method-listener-group",
+        topicPartitions = {@TopicPartition(topic = "message-string-topic", partitions = {"1"})})
     public void consumeSpecificPartition(String message) {
         log.info("Consumer consume the message: {}, from partition: 1", message);
         latch.countDown();

@@ -50,17 +50,7 @@ public class EventController {
         }
     }
 
-    @PostMapping("/publish/event")
-    public ResponseEntity<?> publishEventMessage(@RequestBody Customer customer) {
-        try {
-            publisher.sendEventToTopic(customer);
-            return ResponseEntity.ok("Event message publish successfully ...");
-        } catch (Exception ex) {
-            return ResponseEntity.internalServerError().body(ex.getMessage());
-        }
-    }
-
-    @PostMapping("/event/message")
+    @PostMapping("/publish/message")
     public ResponseEntity<?> publishCustomerMessage(@RequestBody Customer customer) {
         try {
             publisher.sendMessageToTopic(customer);
