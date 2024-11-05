@@ -33,7 +33,7 @@ public class KafkaConsumerConfig {
          */
         Map<Pattern, Deserializer<?>> deserializers = new HashMap<>();
         deserializers.put(Pattern.compile(".*-string"), new StringDeserializer());
-        deserializers.put(Pattern.compile("message-topic"), new JsonDeserializer<>(Customer.class));
+        deserializers.put(Pattern.compile("message-*."), new JsonDeserializer<>(Message.class));
 
         return new DefaultKafkaConsumerFactory<>(KafkaProperties.getInstance().getKafkaConfigDto().propsMap,
                 null, new DelegatingByTopicDeserializer(deserializers, new JsonDeserializer<>()));
