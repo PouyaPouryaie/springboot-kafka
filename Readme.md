@@ -6,6 +6,7 @@ This project showcases how to leverage Apache Kafka with Spring Boot and Java ap
 - **Building Spring Kafka Producers and Consumers**: Facilitate seamless communication between application components.
 - **Implementing Error Handling and Retry Strategies**: Ensure message delivery and data integrity by handling potential errors and retry mechanisms.
 - **Utilizing Avro and Schema Registry**: Enhance data management with Avro serialization and centralized schema management through Schema Registry.
+- **Advance Producer and Consumer**: Customization Producer and Consumer to more flexible for real project
 
 This project empowers developers to gain practical knowledge of Kafka and its integration with Spring Boot Java applications.
 Getting Started
@@ -36,7 +37,10 @@ The project demonstrates essential Kafka functionalities through code examples:
 **Error Handling**: Implemented within the producer and consumer to manage potential errors and ensure message delivery. also show how to use Retry Strategy <br>
 **Service Registry (Avro)**: Integrated for efficient data serialization and centralized schema management by using Avro and schema registry <br>
 **Testcontainer**: Demonstrating how to use Testcontainer to test producer and consumer. you can find it under `src/test/java/ir/bigz/kafka` package in Simple Producer-Consumer module <br>
-**RoutingKafkaTemplate**: Demonstrating how to config Spring Kafka that allows you to dynamically route messages to different topics based on message content. <br>
+**RoutingKafkaTemplate**: Demonstrating how to config Spring Kafka that allows you to dynamically route messages to different topics based on message content. `advance-producer-consumer` project<br>
+**DelegatingByTopicDeserializer**: Demonstrating how to config Spring Kafka that allows you to dynamically deserialize message based on different topics. `advance-producer-consumer` project<br>
+**CustomizeDeserializer**: Demonstrating how to define custom deserializer and use it. you can find it under `producer` at `advance-producer-consumer` project.<br>
+**CustomizeContainerFactory**: Demonstrating how to define a customize container factory and attach to specific `@KafkaListener`. you can find it under `producer` at `advance-producer-consumer` project.<br>
 
 ### Contributing
 
