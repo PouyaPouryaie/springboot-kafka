@@ -25,7 +25,7 @@ public class KafkaMessagePublisher {
 
     public void sendMessageToTopic(UUID messageUUID, Purchase purchase) {
         var purchaseMessage = new Message<>(messageUUID, purchase);
-        CompletableFuture<SendResult<String, Object>> future = template.send("purchase-message", purchaseMessage);
+        CompletableFuture<SendResult<String, Object>> future = template.send("purchase-topic", purchaseMessage);
         future.whenComplete((result, ex) -> {
             if (ex == null) {
                 log.info("Sent Purchase={} with offset={}", purchase.toString(), result.getRecordMetadata().offset());

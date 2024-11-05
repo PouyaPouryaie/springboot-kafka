@@ -29,22 +29,11 @@ public class EventController {
         }
     }
 
-    @GetMapping("/publish/{partition}/{message}")
-    public ResponseEntity<?> publishMessage(@PathVariable int partition, @PathVariable String message) {
+    @PostMapping("/publish/customer")
+    public ResponseEntity<?> publishEventMessage(@RequestBody Customer customer) {
         try {
-            publisher.sendMessageToSpecificPartition(message, partition);
-            return ResponseEntity.ok("message publish successfully ...");
-        } catch (Exception ex) {
-            return ResponseEntity.internalServerError().body(ex.getMessage());
-        }
-    }
-
-    @GetMapping("/publish/bulk/{message}")
-    public ResponseEntity<?> publishBulkMessage(@PathVariable String message) {
-        try {
-            IntStream.range(0, 1000)
-                    .forEach(i -> publisher.sendMessageToTopic(message + " " + i));
-            return ResponseEntity.ok("bulk message publish successfully ...");
+            publisher.sendCustomerToTopic(customer);
+            return ResponseEntity.ok("Event message publish successfully ...");
         } catch (Exception ex) {
             return ResponseEntity.internalServerError().body(ex.getMessage());
         }

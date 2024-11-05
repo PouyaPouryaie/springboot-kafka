@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: consumer
+  profiles:
+    active: production
+#  kafka:
+#    consumer:
+#      bootstrap-servers: 172.21.0.2:9092
+#      group-id: spring-group
+#      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+#      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+#      properties:
+#        spring:
+#          json:
+#            trusted:
+#              packages : ir.bigz.kafka.dto
+
+server:
+  port: 9292
+logging:
+  level:
+    root: WARN
+    org.springframework.web: INFO
+    ir.bigz.kafka: INFO

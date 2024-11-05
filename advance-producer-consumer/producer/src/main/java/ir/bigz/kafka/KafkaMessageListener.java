@@ -13,8 +13,8 @@ public class KafkaMessageListener {
 
     Logger log = LoggerFactory.getLogger(KafkaMessageListener.class);
 
-    @KafkaListener(topics = "purchase-message",
-            containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(topics = "purchase-topic",
+            containerFactory = "kafkaCustomListenerContainerFactory")
     public void consumeMessage(@Payload Message<Purchase> message) {
         log.info("Purchase consume the message: {}", message);
     }
