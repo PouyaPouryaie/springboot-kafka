@@ -271,6 +271,7 @@ docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-topics.sh \
 
 ## Hints
 - For test consumer part, you can define multi method instead of multi instance to connect to kafka 
+- The method annotated with the @DltHandler annotation must be placed in the same class as the @KafkaListener annotated method
 
 # Keyword
 - Consumer rebalancing
