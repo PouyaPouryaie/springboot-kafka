@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.DltHandler;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.RetryableTopic;
+import org.springframework.kafka.retrytopic.DltStrategy;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.retry.annotation.Backoff;
@@ -26,6 +27,7 @@ public class NonBlockingKafkaMessageConsumer {
     @RetryableTopic(
             attempts = "4",
             backoff = @Backoff(delay = 3000, multiplier = 1.5, maxDelay = 15000),
+            dltStrategy = DltStrategy.FAIL_ON_ERROR,
             exclude = {NullPointerException.class}
 //            include = {SocketTimeoutException.class, IOException.class} // you just can use one of exclude or include simultaneously
     )

@@ -34,7 +34,7 @@ To run this project, ensure you have Docker and Docker Compose installed on your
 The project demonstrates essential Kafka functionalities through code examples:
 
 **1. Simple Producer-Consumer**: Demonstrating how to send and receive messages from/to Kafka topics with basic configuration <br>
-**2. Error Handling**: Implemented within the producer and consumer to manage potential errors and ensure message delivery. also show how to use Blocking and Non Blocking Retry Strategy <br>
+**2. Error Handling**: Implemented within the producer and consumer to manage potential errors and ensure message delivery. also show how to use Blocking and Non Blocking Retry Strategy for Dead Letter Topic (DLT) <br>
 **3. Service Registry (Avro)**: Integrated for efficient data serialization and centralized schema management by using Avro and schema registry <br>
 **4. Testcontainer**: Demonstrating how to use Testcontainer to test producer and consumer. you can find it under `src/test/java/ir/bigz/kafka` package in Simple Producer-Consumer module <br>
 **5. RoutingKafkaTemplate**: Demonstrating how to config Spring Kafka that allows you to dynamically route messages to different topics based on message content. `advance-producer-consumer` project<br>

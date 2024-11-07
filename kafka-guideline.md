@@ -194,6 +194,18 @@ docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-topics.sh \
     - You just need to add `@RetryableTopic` on top of your KafkaListener and also define a method that annotates with `@DltHandler`
         - `@RetryableTopic` is non-blocking approach and can imporve performance
         - but there are some disadvantage like change order of a messsage or risk of message duplication
+        - There are Three strategy for DLT
+            - `FAIL_ON_ERROR`: strategy when the DLT consumer won’t try to reprocess an event in case of failure
+            - `ALWAYS_RETRY_ON_ERROR`: strategy ensures that the DLT consumer tries to reprocess the event in case of failure
+            - `No_DLT`: strategy, which turns off the DLT mechanism altogether
+        ```Java
+        // Config dlt strategy at Retryable
+        @RetryableTopic(attempts = "1",dltStrategy = DltStrategy.FAIL_ON_ERROR)
+        @KafkaListener(topics = "topic-name", groupId = "kafka-error-group")
+        public void consumeEvents(Payload data){
+            // put logic here
+        } 
+        ```
 - Schema Registery (Avro Schema)
     - to ensure that new data can be consumed by older consumers that were designed to work with the old schema
     - the requirements which we need are an Avro Maven plugin to define object from Avro Schema file, <br> and Avro Serializer and Deserializer for serialize and deserialize
