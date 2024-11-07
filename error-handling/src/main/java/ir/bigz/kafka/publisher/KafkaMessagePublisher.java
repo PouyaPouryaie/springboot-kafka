@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -18,16 +19,17 @@ public class KafkaMessagePublisher {
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Value("${app.topic.name}")
-    private String topicName;
+    private String defaultTopicName;
 
     public KafkaMessagePublisher(KafkaTemplate<String, Object> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
 
 
-    public void send(User user) {
+    public void send(User user, Optional<String> topicName) {
         try {
-            CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send(topicName, user);
+            CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send(
+                    topicName.orElseGet(() -> defaultTopicName), user);
             future.whenComplete((result, ex) -> {
                 if (ex == null) {
                     System.out.println("Sent message=[" + user.toString() +
@@ -42,10 +44,10 @@ public class KafkaMessagePublisher {
         }
     }
 
-    public void sendCSVFile() {
+    public void sendCSVFile(Optional<String> topicName) {
         try {
             List<User> users = CsvReaderUtils.readDataFromCsv();
-            Objects.requireNonNull(users).forEach(this::send);
+            Objects.requireNonNull(users).forEach(user -> this.send(user, topicName));
         } catch (Exception ex) {
             throw new PublisherException(ex.getMessage());
         }

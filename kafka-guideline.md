@@ -192,6 +192,20 @@ docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-topics.sh \
     - Establish a retry mechanism for Kafka messages. Define the maximum number of retries before routing undeliverable <br> messages to the `Dead Letter Topic` (DLT is a topic that store all the failed message)
     - It prevents lost message. (reliable message process)
     - You just need to add `@RetryableTopic` on top of your KafkaListener and also define a method that annotates with `@DltHandler`
+        - `@RetryableTopic` is non-blocking approach and can imporve performance
+        - but there are some disadvantage like change order of a messsage or risk of message duplication
+        - There are Three strategy for DLT
+            - `FAIL_ON_ERROR`: strategy when the DLT consumer won’t try to reprocess an event in case of failure
+            - `ALWAYS_RETRY_ON_ERROR`: strategy ensures that the DLT consumer tries to reprocess the event in case of failure
+            - `No_DLT`: strategy, which turns off the DLT mechanism altogether
+        ```Java
+        // Config dlt strategy at Retryable
+        @RetryableTopic(attempts = "1",dltStrategy = DltStrategy.FAIL_ON_ERROR)
+        @KafkaListener(topics = "topic-name", groupId = "kafka-error-group")
+        public void consumeEvents(Payload data){
+            // put logic here
+        } 
+        ```
 - Schema Registery (Avro Schema)
     - to ensure that new data can be consumed by older consumers that were designed to work with the old schema
     - the requirements which we need are an Avro Maven plugin to define object from Avro Schema file, <br> and Avro Serializer and Deserializer for serialize and deserialize
@@ -241,11 +255,35 @@ docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-topics.sh \
         return new RoutingKafkaTemplate(producerFactories);
     }
     ```
+- Ack Mode at Consumer
+    - This ensures the message is consumed, and won’t be delivered to the current listener again.
+    - To implement a **Retry logic** for message processing in Kafka, we need to select an **AckMode**.
+        - We shouldn’t set the ack mode to `AckMode.BATCH` or `AckMode.TIME` for Retry logic,  because the consumer won’t redeliver all messages in the batch or time window to itself if an error occurs while processing a message
+    - Types: 
+        1. `Auto-commit`, 2. `After-processing`, 3. `Manual`
+    - Serveral ack modes available that we can configure:
+        
+        1. AckMode.RECORD: In this after-processing mode, the consumer sends an acknowledgment for each message it processes.
+        2. AckMode.BATCH: In this manual mode, the consumer sends an acknowledgment for a batch of messages, rather than for each message.
+        3. AckMode.COUNT: In this manual mode, the consumer sends an acknowledgment after it has processed a specific number of messages.
+        4. AckMode.MANUAL: In this manual mode, the consumer doesn’t send an acknowledgment for the messages it processes.
+        5. AckMode.TIME: In this manual mode, the consumer sends an acknowledgment after a certain amount of time has passed.
+    ```Java
+        @Bean
+        public ConcurrentKafkaListenerContainerFactory<String, Object> greetingKafkaListenerContainerFactory() {
+            ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
+            // Other configurations
+            factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
+            factory.afterPropertiesSet();
+            return factory;
+        }
+    ```
 
 
 
 ## Hints
 - For test consumer part, you can define multi method instead of multi instance to connect to kafka 
+- The method annotated with the @DltHandler annotation must be placed in the same class as the @KafkaListener annotated method
 
 # Keyword
 - Consumer rebalancing

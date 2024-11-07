@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.DltHandler;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.RetryableTopic;
+import org.springframework.kafka.retrytopic.DltStrategy;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.retry.annotation.Backoff;
@@ -19,16 +20,19 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @Service
-public class KafkaMessageConsumer {
+public class NonBlockingKafkaMessageConsumer {
 
-    Logger log = LoggerFactory.getLogger(KafkaMessageConsumer.class);
+    Logger log = LoggerFactory.getLogger(NonBlockingKafkaMessageConsumer.class);
 
     @RetryableTopic(
             attempts = "4",
             backoff = @Backoff(delay = 3000, multiplier = 1.5, maxDelay = 15000),
-            exclude = IOException.class
+            dltStrategy = DltStrategy.FAIL_ON_ERROR,
+            exclude = {NullPointerException.class}
+//            include = {SocketTimeoutException.class, IOException.class} // you just can use one of exclude or include simultaneously
     )
-    @KafkaListener(topics = "${app.topic.name}", groupId = "kafka-error-group")
+    @KafkaListener(topics = "${app.topic.name}", groupId = "kafka-error-group",
+            containerFactory = "defaultKafkaListenerContainerFactory")
     public void consumeEvents(User user,
                               @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
                               @Header(KafkaHeaders.OFFSET) long offset
