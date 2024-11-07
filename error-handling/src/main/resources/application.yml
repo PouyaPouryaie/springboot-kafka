@@ -7,3 +7,5 @@ server:
 app:
   topic:
     name: kafka-error-handle
+    custom:
+      name: kafka-blocking-retry

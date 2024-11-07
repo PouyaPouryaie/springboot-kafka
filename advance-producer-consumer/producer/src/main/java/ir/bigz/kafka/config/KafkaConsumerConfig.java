@@ -36,12 +36,15 @@ public class KafkaConsumerConfig {
     }
 
 
+    /*
+    setConcurrency: The maximum number of concurrent KafkaMessageListenerContainer running.
+                    Messages from within the same partition will be processed sequentially
+     */
     @Bean
     public KafkaListenerContainerFactory<?> kafkaCustomListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConcurrency(3);
-        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.COUNT);
-        factory.setBatchListener(true);
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
         factory.setConsumerFactory(consumerFactory());
         return factory;
     }
