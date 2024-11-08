@@ -41,6 +41,7 @@ The project demonstrates essential Kafka functionalities through code examples:
 **6. DelegatingByTopicDeserializer**: Demonstrating how to config Spring Kafka that allows you to dynamically deserialize message based on different topics. `advance-producer-consumer` project<br>
 **7. CustomizeDeserializer**: Demonstrating how to define custom deserializer and use it. you can find it under `producer` at `advance-producer-consumer` project.<br>
 **8. CustomizeContainerFactory**: Demonstrating how to define a customize container factory and attach to specific `@KafkaListener`. you can find it under `producer` at `advance-producer-consumer` project.<br>
+**9. Batch Listener**: Demonstrating how to enable batch listener and customize it. the name of the method is `kafkaBatchListenerContainerFactory`. you can find it under `consumer` at `advance-producer-consumer` project.<br>
 
 ### Contributing
 

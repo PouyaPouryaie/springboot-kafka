@@ -1,6 +1,7 @@
 package ir.bigz.kafka.config;
 
 import org.apache.kafka.clients.admin.AdminClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -12,10 +13,14 @@ import org.springframework.kafka.core.ProducerFactory;
 @Profile("production")
 public class KafkaProducerConfig {
 
+    @Value("${kafka.bootstrap-server}")
+    private String bootstrapServer;
+
     @Bean
     public ProducerFactory<String, Object> producerFactory() {
-        KafkaProperties kafkaProperties = KafkaProperties.getInstance();
-        return new DefaultKafkaProducerFactory<>(kafkaProperties.getKafkaConfigDto().propsMap);
+        KafkaProperties kafkaProperties = KafkaProperties.Builder.getInstance(bootstrapServer)
+                .defaultProducerConfig().build();
+        return new DefaultKafkaProducerFactory<>(kafkaProperties.getProps());
     }
 
     @Bean
@@ -25,6 +30,8 @@ public class KafkaProducerConfig {
 
     @Bean
     public AdminClient adminClient() {
-        return AdminClient.create(KafkaProperties.getInstance().getKafkaConfigDto().propsMap);
+        KafkaProperties kafkaProperties = KafkaProperties.Builder.getInstance(bootstrapServer)
+                .defaultProducerConfig().build();
+        return AdminClient.create(kafkaProperties.getProps());
     }
 }

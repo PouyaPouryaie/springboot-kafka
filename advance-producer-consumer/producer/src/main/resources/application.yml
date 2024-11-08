@@ -13,3 +13,8 @@ logging:
     root: WARN
     org.springframework.web: INFO
     ir.bigz.kafka: INFO
+
+kafka:
+  bootstrap-server: 172.21.0.2:9092
+  trusted:
+    package: ir.bigz.kafka.dto

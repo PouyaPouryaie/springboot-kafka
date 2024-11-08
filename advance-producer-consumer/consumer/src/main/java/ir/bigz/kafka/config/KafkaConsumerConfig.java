@@ -2,13 +2,11 @@ package ir.bigz.kafka.config;
 
 import ir.bigz.kafka.dto.Customer;
 import ir.bigz.kafka.dto.Message;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.springframework.boot.autoconfigure.kafka.DefaultKafkaConsumerFactoryCustomizer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.KafkaListenerContainerFactory;
@@ -16,7 +14,6 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.support.serializer.DelegatingByTopicDeserializer;
-import org.springframework.kafka.support.serializer.DelegatingByTypeSerializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 import java.util.HashMap;
@@ -26,6 +23,12 @@ import java.util.regex.Pattern;
 @Configuration(proxyBeanMethods = false)
 @Profile("production")
 public class KafkaConsumerConfig {
+
+    @Value("${kafka.bootstrap-server}")
+    private String bootstrapServer;
+
+    @Value("${kafka.trusted.package}")
+    private String trustedPackage;
 
     @Bean
     public ConsumerFactory<String, Object> consumerFactory() {
@@ -38,7 +41,14 @@ public class KafkaConsumerConfig {
         deserializers.put(Pattern.compile("message-topic"), new JsonDeserializer<>(Customer.class));
         deserializers.put(Pattern.compile("message-*."), new JsonDeserializer<>(Message.class));
 
-        return new DefaultKafkaConsumerFactory<>(KafkaProperties.getInstance().getKafkaConfigDto().propsMap,
+        KafkaProperties kafkaProperties = KafkaProperties.Builder
+                .getInstance(bootstrapServer)
+                .consumerConfig(DelegatingByTopicDeserializer.class,
+                        trustedPackage,
+                        "consumer-group")
+                .build();
+
+        return new DefaultKafkaConsumerFactory<>(kafkaProperties.getProps(),
                 null, new DelegatingByTopicDeserializer(deserializers, new JsonDeserializer<>()));
     }
 
@@ -53,12 +63,16 @@ public class KafkaConsumerConfig {
 
     @Bean
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Object>> kafkaBatchListenerContainerFactory() {
-        Map<String, Object> propsMap = new HashMap<>(Map.copyOf(KafkaProperties.getInstance().getKafkaConfigDto().propsMap));
-        propsMap.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        propsMap.put(ConsumerConfig.GROUP_ID_CONFIG, "consumer-batch");
-        propsMap.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "10");
+        KafkaProperties kafkaProperties = KafkaProperties.Builder
+                .getInstance(bootstrapServer)
+                .consumerBatchConfig(StringDeserializer.class,
+                        trustedPackage,
+                        "consumer-batch",
+                        10)
+                .build();
+
         DefaultKafkaConsumerFactory<Object, Object> kafkaConsumerFactory =
-                new DefaultKafkaConsumerFactory<>(propsMap);
+                new DefaultKafkaConsumerFactory<>(kafkaProperties.getProps());
         ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(kafkaConsumerFactory);
         factory.setBatchListener(true);

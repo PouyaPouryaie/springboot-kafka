@@ -27,3 +27,6 @@ kafka:
   topic:
     batch: kafka-batch
   bootstrap-server: 172.21.0.2:9092
+  trusted:
+    package: ir.bigz.kafka.dto
+
