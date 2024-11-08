@@ -278,6 +278,24 @@ docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-topics.sh \
             return factory;
         }
     ```
+- Batch Listener
+    - a batch listener is a mechanism to consume and process multiple messages from Kafka in a single batch. This can significantly improve performance and reduce overhead, especially when dealing with high-throughput scenarios
+    - To use Batch listener you should enable it at container Factory Object and also set the Batch Size at consumer Factory Object
+    - Batch Size: Defines the maximum number of messages to be consumed in a single batch
+    ```java
+        @Bean
+        public ConcurrentKafkaListenerContainerFactory<String, Object> greetingKafkaListenerContainerFactory() {
+            props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 10); // batch size
+            DefaultKafkaConsumerFactory<Object, Object> kafkaConsumerFactory =
+                new DefaultKafkaConsumerFactory<>(props);
+            ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
+            // Other configurations
+            factory.setBatchListener(true);
+            factory.setConsumerFactory(kafkaConsumerFactory);
+            return factory;
+        }
+    ```
+    
 
 
 
