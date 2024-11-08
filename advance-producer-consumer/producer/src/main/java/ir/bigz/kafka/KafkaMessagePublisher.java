@@ -26,7 +26,7 @@ public class KafkaMessagePublisher {
         CompletableFuture<SendResult<Object, Object>> future = template.send("spring-topic-string", message);
         future.whenComplete((result, ex) -> {
             if (ex == null) {
-                log.info("Sent Message={} with offset={}", message, result.getRecordMetadata().offset());
+                log.info("Sent String Message={} with offset={}", message, result.getRecordMetadata().offset());
             } else {
                 log.error("Unable to send message={} due to {}", message, ex.getMessage());
             }
@@ -54,5 +54,19 @@ public class KafkaMessagePublisher {
                 log.error("Unable to send Message={} due to {}", customerMessage, ex.getMessage());
             }
         });
+    }
+
+    public void sendBatchMessageToTopic(int size) {
+        for (int i = 0 ; i < size; i++) {
+            var payload = "message: " + i;
+            CompletableFuture<SendResult<Object, Object>> future = template.send("kafka-batch", payload);
+            future.whenComplete((result, ex) -> {
+                if (ex == null) {
+                    log.info("Sent Batch Message={} with offset={}", payload, result.getRecordMetadata().offset());
+                } else {
+                    log.error("Unable to send Batch Message={} due to {}", payload, ex.getMessage());
+                }
+            });
+        }
     }
 }

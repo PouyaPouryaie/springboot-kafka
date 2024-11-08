@@ -2,11 +2,13 @@ package ir.bigz.kafka.config;
 
 import ir.bigz.kafka.dto.Customer;
 import ir.bigz.kafka.dto.Message;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.boot.autoconfigure.kafka.DefaultKafkaConsumerFactoryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.KafkaListenerContainerFactory;
@@ -46,6 +48,21 @@ public class KafkaConsumerConfig {
             (ConsumerFactory<String, Object> consumerFactory) {
         ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
+        return factory;
+    }
+
+    @Bean
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Object>> kafkaBatchListenerContainerFactory() {
+        Map<String, Object> propsMap = new HashMap<>(Map.copyOf(KafkaProperties.getInstance().getKafkaConfigDto().propsMap));
+        propsMap.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        propsMap.put(ConsumerConfig.GROUP_ID_CONFIG, "consumer-batch");
+        propsMap.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "10");
+        DefaultKafkaConsumerFactory<Object, Object> kafkaConsumerFactory =
+                new DefaultKafkaConsumerFactory<>(propsMap);
+        ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(kafkaConsumerFactory);
+        factory.setBatchListener(true);
+        factory.setConcurrency(1);
         return factory;
     }
 

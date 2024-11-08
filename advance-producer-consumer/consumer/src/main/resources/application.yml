@@ -22,3 +22,8 @@ logging:
     root: WARN
     org.springframework.web: INFO
     ir.bigz.kafka: INFO
+
+kafka:
+  topic:
+    batch: kafka-batch
+  bootstrap-server: 172.21.0.2:9092
