@@ -20,3 +20,9 @@ spring:
 
 server:
   port: 9292
+
+test:
+  customer:
+    topic: message-customer-topic
+  string:
+    topic: message-string-topic
