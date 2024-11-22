@@ -7,19 +7,15 @@ import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.utility.DockerImageName;
 
 @Configuration(proxyBeanMethods = false)
-public class ContainerConfig {
+public class KafkaContainerConfig {
 
     @Bean
     @ServiceConnection
     public KafkaContainer kafkaContainer() {
-//        KafkaContainer kafkaContainer = new KafkaContainer(
-//                DockerImageName.parse("confluentinc/cp-kafka:7.4.0")
-//                .asCompatibleSubstituteFor("apache/kafka"));
-        KafkaContainer kafkaContainer = new KafkaContainer(
-                DockerImageName.parse("confluentinc/cp-kafka:7.4.0")
+        return new KafkaContainer(
+                DockerImageName.parse("confluentinc/cp-kafka:7.6.1")
                         .asCompatibleSubstituteFor("apache/kafka"))
                 .withKraft();
-        return kafkaContainer;
     }
 
 }

@@ -35,7 +35,7 @@ public class KafkaConsumerConfig {
 
     @Bean
     public ConsumerFactory<String, Message<Object>> consumerFactory(KafkaConfigDto kafkaConfigDto) {
-        return new DefaultKafkaConsumerFactory<>(kafkaConfigDto.propsMap);
+        return new DefaultKafkaConsumerFactory<>(kafkaConfigDto.getPropsMap());
     }
 
     @Bean

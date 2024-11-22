@@ -13,6 +13,10 @@ Getting Started
 
 To run this project, ensure you have Docker and Docker Compose installed on your system.
 
+### Version of Tools and Frameworks
+- Spring boot: 3.3.4
+- Kafka: 3.8.1
+
 ### Prerequisites:
 
 - Java 21

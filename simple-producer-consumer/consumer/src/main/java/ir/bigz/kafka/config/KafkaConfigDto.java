@@ -9,9 +9,13 @@ so I have to create a bean and fill the properties map for kafka and then inject
 
 public class KafkaConfigDto {
 
-    Map<String, Object> propsMap;
+    private Map<String, Object> propsMap;
 
     public KafkaConfigDto(Map<String, Object> propsMap) {
         this.propsMap = propsMap;
+    }
+
+    public Map<String, Object> getPropsMap() {
+        return propsMap;
     }
 }

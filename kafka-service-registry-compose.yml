@@ -2,7 +2,7 @@ services:
   kafka_b:
     container_name: kafka_b
     hostname: kafka_b
-    image: bitnami/kafka:latest
+    image: bitnami/kafka:3.8.1
     ports:
       - '9092:9092'
       - '9094:9094'
@@ -25,7 +25,7 @@ services:
   kafka-ui:
     container_name: kafka-ui
     hostname: kafka-ui
-    image: provectuslabs/kafka-ui:latest
+    image: provectuslabs/kafka-ui:v0.7.2
     depends_on: 
       - kafka_b
     ports:

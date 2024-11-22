@@ -1,22 +1,47 @@
 
 # Run Kafka by using Docker & docker-compose
-1. write a compose file
-2. open a terminal at the location where the docker-compose file is created there before
-3. run below command at the terminal
+1. To run Kafka you could use `Kafka-compose.yml` file.
+3. create the `docker-volume` folder as a volume att the location where `Kafka-compose.yml` is exist 
+4. open a terminal at the location where the `Kafka-compose.yml` file is exist there
+5. run below command at the terminal
 ```bash
-docker compose -f <docker-compose-file> up -d
+docker compose -f Kafka-compose.yml up -d
 ```
 ## Access kafa instance on Docker
+To access the kafka instance on Docker, you should use the following command:
+`docker exec -it <kafka-instance-name> </bin/sh or bash>`
 ```bash
-docker exec -it kafka # </bin/sh or bash>
+# Example
+docker exec -it kafka-sample bash
 ```
 
 ## UI for Kafka
-Provectus Kafka UI
+Kafka-UI, a user interface tool developed by Provectus Labs, is used in this project to facilitate user interaction with Kafka. <br>
+
+### Step 1: Run the Kafka-ui
+### First Approach - use compose file : 
+    1. To run Kafka you could use `Kafka-ui-compose.yml` file.
+    2. create the `kafka-ui-volume` folder as a volume att the location where `Kafka-ui-compose.yml` is exist 
+    3. open a terminal at the location where the `Kafka-ui-compose.yml` file is exist there
+    4. run below command at the terminal
+
 ```bash
-docker run -it -p 8080:8080 -e DYNAMIC_CONFIG_ENABLED=true provectuslabs/kafka-ui
+docker compose -f Kafka-ui-compose.yml up -d
 ```
-- For a successful connection to Kafka Instance, you need to specify the correct hostname (kafka-instance-name) and port (external port)
+
+### Second Approach - use command :
+
+```bash
+docker run -it -p 8080:8080 --network <kafka-docker-network> -e DYNAMIC_CONFIG_ENABLED=true --name kafka-ui provectuslabs/kafka-ui:v0.7.2
+```
+
+- __Attention: The network between kafka and kafka-ui should be same for rest of project__
+
+### Second Step:
+Connect kafka-ui to kafka instance.
+1. Open a browser and navigate to `http://localhost:8080`
+2. At the dashboad panel click configure new cluster
+3. Enter the Kafka instance name (`kafka-sample`) and port number (`9094`) in the Bootstrap Servers field
 
 
 # Kafka CLI Commands With Docker
@@ -24,7 +49,7 @@ docker run -it -p 8080:8080 -e DYNAMIC_CONFIG_ENABLED=true provectuslabs/kafka-u
 ## Create a topic
 ```bash
 docker run -it --rm \
---network <kafka-docker-network> bitnami/kafka:latest \
+--network <kafka-docker-network> bitnami/kafka:3.8.1 \
 kafka-topics.sh --bootstrap-server <kafka-instance>:<external-port> --create \
 --topic <topic-name> --partitions 3 --replication-factor 1
 ```
@@ -40,7 +65,7 @@ docker run -it --rm --network <kafka-docker-network> \
 bitnami/kafka:latest kafka-topics.sh --bootstrap-server <kafka-instance>:<external-port> --list
 
 # example:
-docker run -it --rm --network kafka-docker_default \
+docker run -it --rm --network kafka-network \
 bitnami/kafka:latest kafka-topics.sh --bootstrap-server kafka-sample:9094 --list
 ```
 
@@ -56,6 +81,11 @@ docker run -it --rm --network kafka-docker_default \
 bitnami/kafka:latest kafka-topics.sh --bootstrap-server kafka-sample:9094 --describe --topic pouya-topic
 
 docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server 127.0.0.1:9092 --describe --topic pouya-topic
+```
+
+## Check Kafka Version
+```bash
+docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-broker-api-versions.sh --version
 ```
 
 ## Produce & Consume Data with Kafka-console
@@ -79,6 +109,13 @@ kafka-console-producer.sh --broker-list 127.0.0.1:9092 --topic <topic-name> <pat
 kafka-console-producer.sh --broker-list localhost:9092 --topic pouya-topic </Users/data/users.csv
 ```
 
+- Log Compaction
+```bash
+kafka-configs.sh --alter --entity-type topics --entity-name <topic-name> 
+--add-config 'cleanup.policy=compact' --bootstrap-server <broker_host>:<broker_port>
+```
+
+
 # Note
 - Access to kafka in the container without create another instance
 ```bash
@@ -90,10 +127,12 @@ docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-topics.sh \
 --bootstrap-server 127.0.0.1:9092 --describe --topic pouya-topic
 ```
 
-- Version of the Kafka is 3.8.0
-- For UI
-    - `docker pull provectuslabs/kafka-ui`
-    - `docker run -it -p 8080:8080 --network <kafka-docker-network> -e DYNAMIC_CONFIG_ENABLED=true --name kafka-ui provectuslabs/kafka-ui`
+- Kafka
+    - version: 3.8.1
+- Kafka-UI
+    - provectuslabs/Kafka-ui version v0.7.2
+- The network between kafka and kafka-ui should be same
+
 
 
 

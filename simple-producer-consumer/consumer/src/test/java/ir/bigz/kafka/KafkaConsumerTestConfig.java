@@ -1,5 +1,7 @@
 package ir.bigz.kafka;
 
+import ir.bigz.kafka.config.KafkaConfigDto;
+import ir.bigz.kafka.dto.Message;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -13,6 +15,7 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.core.*;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
+import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.testcontainers.containers.KafkaContainer;
@@ -27,51 +30,46 @@ public class KafkaConsumerTestConfig {
     @Autowired
     KafkaContainer kafkaContainer;
 
-    Map<String, Object> consumerConfigMap = new HashMap<>();
-    Map<String, Object> producerConfigMap = new HashMap<>();
-
-
-    public void kafkaProducerConfig() {
-        producerConfigMap.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaContainer.getBootstrapServers());
-        producerConfigMap.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        producerConfigMap.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-    }
-
-    public void kafkaConsumerConfig() {
-        consumerConfigMap.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaContainer.getBootstrapServers());
-        consumerConfigMap.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        consumerConfigMap.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        consumerConfigMap.put(JsonDeserializer.TRUSTED_PACKAGES, "ir.bigz.kafka.dto");
-        consumerConfigMap.put(ConsumerConfig.GROUP_ID_CONFIG, "spring-group");
-        consumerConfigMap.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+    @Bean
+    public KafkaConfigDto kafkaConfigDto() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaContainer.getBootstrapServers());
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
+        props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class.getName());
+        props.put(JsonDeserializer.TRUSTED_PACKAGES, "ir.bigz.kafka.dto");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "spring-group");
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        return new KafkaConfigDto(props);
     }
 
     @Bean
-    public ProducerFactory<String, Object> producerFactory() {
-        kafkaProducerConfig();
-        return new DefaultKafkaProducerFactory<>(producerConfigMap);
+    public ProducerFactory<String, Object> producerFactory(KafkaConfigDto kafkaConfigDto) {
+        return new DefaultKafkaProducerFactory<>(kafkaConfigDto.getPropsMap());
     }
 
     @Bean
-    public KafkaTemplate<String, Object> kafkaTemplate(ProducerFactory producerFactory) {
+    public KafkaTemplate<String, Object> kafkaTemplate(ProducerFactory<String, Object> producerFactory) {
         return new KafkaTemplate<>(producerFactory);
     }
 
     @Bean
-    public ConsumerFactory<String, Object> consumerFactory() {
-        kafkaConsumerConfig();
-        return new DefaultKafkaConsumerFactory<>(consumerConfigMap);
+    public ConsumerFactory<String, Object> consumerFactory(KafkaConfigDto kafkaConfigDto) {
+        return new DefaultKafkaConsumerFactory<>(kafkaConfigDto.getPropsMap());
     }
 
     @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Object>> kafkaListenerContainerFactory(ConsumerFactory consumerFactory) {
-        ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Message<Object>>> kafkaListenerContainerFactory
+            (ConsumerFactory<String, Object> consumerFactory) {
+        ConcurrentKafkaListenerContainerFactory<String, Message<Object>> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
         return factory;
     }
 
     @Bean
     public NewTopic createTopicWithNewTopic() {
-        return new NewTopic("pouya-topic", 3, (short) 1);
+        return new NewTopic("message-string-topic", 3, (short) 1);
     }
 }
