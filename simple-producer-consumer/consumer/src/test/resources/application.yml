@@ -20,9 +20,15 @@ spring:
 
 server:
   port: 9292
-
+logging:
+  level:
+    root: WARN
+    org.springframework.web: ERROR
+    ir.bigz.kafka: INFO
+  pattern:
+    console: "%d{HH:mm:ss}  [%thread] %-5level %logger{36} - %msg%n"
 test:
-  customer:
+  message:
     topic: message-customer-topic
   string:
     topic: message-string-topic

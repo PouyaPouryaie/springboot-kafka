@@ -5,3 +5,10 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
   profiles:
     active: test
+logging:
+  level:
+    root: WARN
+    org.springframework.web: ERROR
+    ir.bigz.kafka: INFO
+  pattern:
+    console: "%d{HH:mm:ss}  [%thread] %-5level %logger{36} - %msg%n"

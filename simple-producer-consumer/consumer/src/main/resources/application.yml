@@ -23,3 +23,10 @@ logging:
     root: WARN
     org.springframework.web: INFO
     ir.bigz.kafka: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss}  [%thread] %-5level %logger{36} - %msg%n"
+Kafka:
+  config:
+    bootstrap-server: 172.21.0.2:9092
+    trusted-package: ir.bigz.kafka.dto
+    default-consumer-group-id: consumer-group

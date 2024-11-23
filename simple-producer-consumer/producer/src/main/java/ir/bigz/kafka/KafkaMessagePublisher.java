@@ -33,9 +33,9 @@ public class KafkaMessagePublisher {
         CompletableFuture<SendResult<String, Object>> future = template.send("message-string-topic", message);
         future.whenComplete((result, ex) -> {
             if (ex == null) {
-                log.info("Sent Message={} with offset={}", message, result.getRecordMetadata().offset());
+                log.info("Sent Message= {} with offset= {}", message, result.getRecordMetadata().offset());
             } else {
-                log.error("Unable to send message={} due to {}", message, ex.getMessage());
+                log.error("Unable to send message= {} due to {}", message, ex.getMessage());
             }
         });
     }
@@ -45,13 +45,13 @@ public class KafkaMessagePublisher {
             CompletableFuture<SendResult<String, Object>> future = template.send("message-string-topic", partition, null, message);
             future.whenComplete((result, ex) -> {
                 if (ex == null) {
-                    log.info("Sent Message={} with offset={} to partition={}", message, result.getRecordMetadata().offset(), partition);
+                    log.info("Sent Message= {} with offset= {} to partition= {}", message, result.getRecordMetadata().offset(), partition);
                 } else {
-                    log.error("Unable to send message={} due to {}", message, ex.getMessage());
+                    log.error("Unable to send message= {} due to {}", message, ex.getMessage());
                 }
             });
         } else {
-            log.error("Unable to send message={} due to partition={} doesn't exist", message, partition);
+            log.error("Unable to send message= {} due to partition= {} doesn't exist", message, partition);
             throw new RuntimeException("Partition doesn't exist");
         }
 
@@ -62,9 +62,9 @@ public class KafkaMessagePublisher {
         CompletableFuture<SendResult<String, Object>> future = template.send("message-customer-topic", customerMessage);
         future.whenComplete((result, ex) -> {
             if (ex == null) {
-                log.info("Sent Message={} with offset={}", customerMessage, result.getRecordMetadata().offset());
+                log.info("Sent Message= {} with offset= {}", customerMessage, result.getRecordMetadata().offset());
             } else {
-                log.error("Unable to send Message={} due to {}", customerMessage, ex.getMessage());
+                log.error("Unable to send Message= {} due to {}", customerMessage, ex.getMessage());
             }
         });
     }

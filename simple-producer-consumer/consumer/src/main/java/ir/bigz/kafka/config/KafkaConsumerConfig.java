@@ -21,15 +21,21 @@ import java.util.Map;
 @Profile("production")
 public class KafkaConsumerConfig {
 
+    private final KafkaProperties kafkaProperties;
+
+    public KafkaConsumerConfig(KafkaProperties kafkaProperties) {
+        this.kafkaProperties = kafkaProperties;
+    }
+
     @Bean
     public KafkaConfigDto kafkaConfigDto() {
         Map<String, Object> props = new HashMap<>();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "172.21.0.2:9092");
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServer());
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
         props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class.getName());
-        props.put(JsonDeserializer.TRUSTED_PACKAGES, "ir.bigz.kafka.dto");
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "consumer-group");
+        props.put(JsonDeserializer.TRUSTED_PACKAGES, kafkaProperties.getTrustedPackage());
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaProperties.getDefaultConsumerGroupId());
         return new KafkaConfigDto(props);
     }
 
