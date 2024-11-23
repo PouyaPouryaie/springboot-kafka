@@ -1,17 +1,16 @@
 package ir.bigz.kafka.config;
 
 import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
-import org.springframework.kafka.config.KafkaListenerContainerFactory;
-import org.springframework.kafka.core.ConsumerFactory;
-import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
-import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.utility.DockerImageName;
@@ -46,19 +45,28 @@ public class KafkaProducerTestConfig {
     }
 
     @Bean
+    public ProducerFactory<String, Object> defaultProducerFactory(KafkaConfigDto kafkaConfigDto) {
+        return new DefaultKafkaProducerFactory<>(kafkaConfigDto.getPropsMap());
+    }
+
+    @Bean
+    public KafkaTemplate<String, Object> kafkaTemplate(ProducerFactory<String, Object> producerFactory) {
+        return new KafkaTemplate<>(producerFactory);
+    }
+
+    @Bean
     public AdminClient adminClient(KafkaConfigDto kafkaConfigDto) {
         return AdminClient.create(kafkaConfigDto.getPropsMap());
     }
 
     @Bean
-    public ConsumerFactory<String, Object> consumerFactory(KafkaContainer kafkaContainer) {
-        return new DefaultKafkaConsumerFactory<>(kafkaConfigDto(kafkaContainer).getPropsMap());
+    public NewTopic createStringTopic() {
+        return new NewTopic("message-string-topic", 3, (short) 1);
     }
 
     @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Object>> kafkaListenerContainerFactory(KafkaContainer kafkaContainer) {
-        ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(consumerFactory(kafkaContainer));
-        return factory;
+    public NewTopic createMessageTopic() {
+        return new NewTopic("message-customer-topic", 1, (short) 1);
     }
+
 }

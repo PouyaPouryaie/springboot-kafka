@@ -24,9 +24,9 @@ import java.util.concurrent.TimeUnit;
 @Testcontainers
 @Import(KafkaProducerTestConfig.class)
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-class ProducerApplicationTests {
+class KafkaMessagePublisherTest {
 
-	Logger log = LoggerFactory.getLogger(ProducerApplicationTests.class);
+	Logger log = LoggerFactory.getLogger(KafkaMessagePublisherTest.class);
 
 	static KafkaContainer kafkaContainer;
 
@@ -47,7 +47,29 @@ class ProducerApplicationTests {
 	}
 
 	@Test
-	public void send_event_to_topic_pass_test() {
+	public void sendMessageToTopic_string_input_pass_test() {
+		publisher.sendMessageToTopic("sendMessageToTopic message");
+		Awaitility.await()
+				.pollInterval(Duration.ofSeconds(3))
+				.atMost(10, TimeUnit.SECONDS)
+				.untilAsserted(() -> {
+					log.info("The test is passed");
+		});
+	}
+
+	@Test
+	public void sendMessageToSpecificPartition_pass_test() {
+		publisher.sendMessageToSpecificPartition("sendMessageToSpecificPartition message", 1);
+		Awaitility.await()
+				.pollInterval(Duration.ofSeconds(3))
+				.atMost(10, TimeUnit.SECONDS)
+				.untilAsserted(() -> {
+					log.info("The test is passed");
+				});
+	}
+
+	@Test
+	public void sendMessageToTopic_customer_input_pass_test() {
 		Customer customer = new Customer(1, "sina", "sina@yahoo.com");
 		publisher.sendMessageToTopic(customer);
 		Awaitility.await()
@@ -55,6 +77,6 @@ class ProducerApplicationTests {
 				.atMost(10, TimeUnit.SECONDS)
 				.untilAsserted(() -> {
 					log.info("The test is passed");
-		});
+				});
 	}
 }
