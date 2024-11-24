@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutionException;
 @Service
 public class KafkaMessagePublisher {
 
-    Logger log = LoggerFactory.getLogger(KafkaMessagePublisher.class);
+    private static final Logger log = LoggerFactory.getLogger(KafkaMessagePublisher.class);
 
     // to communicate with kafka we need to use kafkaTemplate class
     private final KafkaTemplate<String, Object> template;

@@ -12,7 +12,6 @@ import java.util.stream.IntStream;
 @RequestMapping("/producer")
 public class EventController {
 
-    private static final Logger log = LoggerFactory.getLogger(EventController.class);
     private final KafkaMessagePublisher publisher;
 
     public EventController(KafkaMessagePublisher publisher) {
