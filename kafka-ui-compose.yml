@@ -2,7 +2,8 @@ services:
   kafka-ui:
     container_name: kafka-ui
     hostname: kafka-ui
-    image: provectuslabs/kafka-ui:v0.7.2
+    # image: provectuslabs/kafka-ui:v0.7.2
+    image: kafbat/kafka-ui:main
     ports:
       - '8080:8080'
     volumes:
