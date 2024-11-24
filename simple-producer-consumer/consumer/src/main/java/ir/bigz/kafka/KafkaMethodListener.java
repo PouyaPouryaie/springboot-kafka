@@ -17,7 +17,7 @@ import java.util.concurrent.CountDownLatch;
 @Service
 public class KafkaMethodListener {
 
-    Logger log = LoggerFactory.getLogger(KafkaMethodListener.class);
+    private static final Logger log = LoggerFactory.getLogger(KafkaMethodListener.class);
 
     private CountDownLatch latch = new CountDownLatch(1);
 

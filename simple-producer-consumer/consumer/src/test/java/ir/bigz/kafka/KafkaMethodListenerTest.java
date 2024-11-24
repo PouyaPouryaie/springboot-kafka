@@ -1,5 +1,6 @@
 package ir.bigz.kafka;
 
+import ir.bigz.kafka.config.KafkaConsumerTestConfig;
 import ir.bigz.kafka.dto.Customer;
 import ir.bigz.kafka.dto.Message;
 import jakarta.annotation.PostConstruct;

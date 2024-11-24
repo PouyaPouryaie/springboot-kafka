@@ -1,6 +1,5 @@
-package ir.bigz.kafka;
+package ir.bigz.kafka.config;
 
-import ir.bigz.kafka.config.KafkaConfigDto;
 import ir.bigz.kafka.dto.Message;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
