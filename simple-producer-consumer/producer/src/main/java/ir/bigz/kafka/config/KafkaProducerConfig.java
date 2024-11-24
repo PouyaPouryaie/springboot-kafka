@@ -20,6 +20,12 @@ import java.util.Map;
 @Profile("production")
 public class KafkaProducerConfig {
 
+    private final KafkaProperties kafkaProperties;
+
+    public KafkaProducerConfig(KafkaProperties kafkaProperties) {
+        this.kafkaProperties = kafkaProperties;
+    }
+
     @Bean
     public NewTopic createTopicWithTopicBuilder() {
         return TopicBuilder.name("message-string-topic-builder")
@@ -47,7 +53,7 @@ public class KafkaProducerConfig {
     @Bean
     public KafkaConfigDto kafkaConfigDto() {
         Map<String, Object> props = new HashMap<>();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "172.21.0.2:9092");
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServer());
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
         return new KafkaConfigDto(props);

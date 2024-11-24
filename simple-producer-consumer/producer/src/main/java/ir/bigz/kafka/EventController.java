@@ -9,10 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.stream.IntStream;
 
 @RestController
-@RequestMapping("/producer-app")
+@RequestMapping("/producer")
 public class EventController {
 
-    private static final Logger log = LoggerFactory.getLogger(EventController.class);
     private final KafkaMessagePublisher publisher;
 
     public EventController(KafkaMessagePublisher publisher) {

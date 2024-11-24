@@ -15,11 +15,11 @@ import org.springframework.stereotype.Component;
 @KafkaListener(topics = "message-customer-topic", groupId = "class-listener-group")
 public class KafkaClassListener {
 
-    private final Logger log = LoggerFactory.getLogger(KafkaClassListener.class);
+    private static final Logger log = LoggerFactory.getLogger(KafkaClassListener.class);
 
     @KafkaHandler
     public void consumeMessage(@Payload Message<Customer> message, @Headers MessageHeaders headers) {
-        log.info("Consumer consume the message payload: {}", message.toString());
+        log.info("received message: {}", message.toString());
         headers.keySet().forEach(key -> log.info("{}:{}", key, headers.get(key)));
     }
 }

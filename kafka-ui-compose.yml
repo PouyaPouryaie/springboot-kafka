@@ -2,7 +2,8 @@ services:
   kafka-ui:
     container_name: kafka-ui
     hostname: kafka-ui
-    image: provectuslabs/kafka-ui:latest
+    # image: provectuslabs/kafka-ui:v0.7.2
+    image: kafbat/kafka-ui:main
     ports:
       - '8080:8080'
     volumes:
@@ -11,10 +12,10 @@ services:
       DYNAMIC_CONFIG_ENABLED: 'true'
       LOGGING_LEVEL_ROOT: 'DEBUG'
     networks:
-      - kafka-docker_default
+      - kafka-network
 
 networks:
-  kafka-docker_default:
+  kafka-network:
     external: true
 
 volumes:

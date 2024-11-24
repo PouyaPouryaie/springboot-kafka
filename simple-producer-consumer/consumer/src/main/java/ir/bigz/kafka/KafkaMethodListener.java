@@ -7,35 +7,42 @@ import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.PartitionOffset;
 import org.springframework.kafka.annotation.TopicPartition;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 @Service
 public class KafkaMethodListener {
 
-    Logger log = LoggerFactory.getLogger(KafkaMethodListener.class);
+    private static final Logger log = LoggerFactory.getLogger(KafkaMethodListener.class);
 
     private CountDownLatch latch = new CountDownLatch(1);
 
     @KafkaListener(topics = "message-customer-topic")
     public void consume(Message<Customer> customer) {
-        log.info("Consumer consume the customer: {}", customer);
+        log.info("received message= {}", customer);
         latch.countDown();
     }
 
     @KafkaListener(topics = "message-string-topic", groupId = "method-listener-group",
             topicPartitions = {@TopicPartition(topic = "message-string-topic",
                     partitionOffsets = { @PartitionOffset(partition = "0", initialOffset = "0")})})
-    public void consumeSpecificPartitionFromBeginning(String message) {
-        log.info("Consumer From Beginning consume the message: {}, partition: 0", message);
+    public void consumeSpecificPartitionFromBeginning(String message,
+                                                      @Header(KafkaHeaders.RECEIVED_PARTITION) long partition,
+                                                      @Header(KafkaHeaders.OFFSET) long offset) {
+        log.info("received message: {}, with partition-offset= {}", message, partition + "-" + offset);
         latch.countDown();
     }
 
     @KafkaListener(topics = "message-string-topic", groupId = "method-listener-group",
         topicPartitions = {@TopicPartition(topic = "message-string-topic", partitions = {"1"})})
-    public void consumeSpecificPartition(String message) {
-        log.info("Consumer consume the message: {}, from partition: 1", message);
+    public void consumeSpecificPartition(String message,
+                                         @Header(KafkaHeaders.RECEIVED_PARTITION) long partition,
+                                         @Header(KafkaHeaders.OFFSET) long offset) {
+        log.info("received message: {}, with partition-offset= {}", message, partition + "-" + offset);
         latch.countDown();
     }
 
