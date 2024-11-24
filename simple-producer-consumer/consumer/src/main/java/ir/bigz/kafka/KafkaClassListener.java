@@ -19,7 +19,7 @@ public class KafkaClassListener {
 
     @KafkaHandler
     public void consumeMessage(@Payload Message<Customer> message, @Headers MessageHeaders headers) {
-        log.info("Consumer consume the message payload: {}", message.toString());
+        log.info("received message: {}", message.toString());
         headers.keySet().forEach(key -> log.info("{}:{}", key, headers.get(key)));
     }
 }

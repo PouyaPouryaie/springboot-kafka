@@ -100,6 +100,12 @@ class KafkaMethodListenerTest {
         kafkaTemplate.send(stringTopic, 0, null, "second message");
         log.info("message sent to kafka successfully ....");
         if(kafkaMethodListener.getLatch().await(5, TimeUnit.SECONDS)) {
+            log.info("first message received successfully ....");
+            Assertions.assertEquals(0, kafkaMethodListener.getLatch().getCount());
+        }
+        kafkaMethodListener.resetLatch();
+        if(kafkaMethodListener.getLatch().await(5, TimeUnit.SECONDS)) {
+            log.info("second message received successfully ....");
             Assertions.assertEquals(0, kafkaMethodListener.getLatch().getCount());
         }
         log.info("test execution ended");
