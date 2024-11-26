@@ -1,6 +1,7 @@
 package ir.bigz.kafka.service_registry.producer;
 
 import ir.bigz.kafka.service_registry.dto.Employee;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,13 +26,15 @@ public class KafkaProducer {
     }
 
     public void send(Employee employee) {
-        CompletableFuture<SendResult<String, Employee>> future = kafkaTemplate.send(topicName, employee.getId().toString(), employee);
+        ProducerRecord<String, Employee> record = new ProducerRecord<>(topicName, employee.getId().toString(), employee);
+        CompletableFuture<SendResult<String, Employee>> future = kafkaTemplate.send(record);
 
         future.whenComplete((result, ex) -> {
             if (ex == null) {
-                log.info("Employee sent successfully. Employee:{} and offset:{}", employee, result.getRecordMetadata().offset());
+                log.info("Record sent successfully. Record:[key:{} value:{}] Meta:[topic: {}, partition: {}, offset:{}]",
+                        record.key(), record.value(), result.getRecordMetadata().topic(), result.getRecordMetadata().partition(), result.getRecordMetadata().offset());
             } else {
-                log.error("Employee sent failed, Employee: {}, ex: {}", employee, ex.getMessage());
+                log.error("Error: Record sent failed, Record:[key:{} value:{}] Error: {}", record.key(), record.value(), ex.getMessage());
                 throw new RuntimeException("Employee sent failed, Employee: " + employee, ex);
             }
         });

@@ -16,6 +16,6 @@ public class KafkaConsumer {
     public void listen(ConsumerRecord<String, Employee> record) {
         String key = record.key();
         Employee employee = record.value();
-        log.info("Avro message received for key : {}, value : {}", key, employee.toString());
+        log.info("Record received for key : {}, value : {}", key, employee.toString());
     }
 }
