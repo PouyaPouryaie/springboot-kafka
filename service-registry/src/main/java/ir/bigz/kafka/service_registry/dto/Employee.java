@@ -13,10 +13,10 @@ import org.apache.avro.message.SchemaStore;
 
 @org.apache.avro.specific.AvroGenerated
 public class Employee extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
-  private static final long serialVersionUID = -8729300316407917358L;
+  private static final long serialVersionUID = 9085162971166601999L;
 
 
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"Employee\",\"namespace\":\"ir.bigz.kafka.service_registry.dto\",\"fields\":[{\"name\":\"id\",\"type\":\"string\"},{\"name\":\"firstName\",\"type\":\"string\"},{\"name\":\"middleName\",\"type\":\"string\",\"default\":\"\"},{\"name\":\"lastName\",\"type\":\"string\"},{\"name\":\"emailId\",\"type\":\"string\",\"default\":\"\"}]}");
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"Employee\",\"namespace\":\"ir.bigz.kafka.service_registry.dto\",\"fields\":[{\"name\":\"id\",\"type\":\"string\"},{\"name\":\"firstName\",\"type\":\"string\"},{\"name\":\"middleName\",\"type\":\"string\",\"default\":\"\"},{\"name\":\"lastName\",\"type\":\"string\"},{\"name\":\"emailAddress\",\"type\":\"string\",\"default\":\"\"}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
 
   private static final SpecificData MODEL$ = new SpecificData();
@@ -76,7 +76,7 @@ public class Employee extends org.apache.avro.specific.SpecificRecordBase implem
   private java.lang.CharSequence firstName;
   private java.lang.CharSequence middleName;
   private java.lang.CharSequence lastName;
-  private java.lang.CharSequence emailId;
+  private java.lang.CharSequence emailAddress;
 
   /**
    * Default constructor.  Note that this does not initialize fields
@@ -91,14 +91,14 @@ public class Employee extends org.apache.avro.specific.SpecificRecordBase implem
    * @param firstName The new value for firstName
    * @param middleName The new value for middleName
    * @param lastName The new value for lastName
-   * @param emailId The new value for emailId
+   * @param emailAddress The new value for emailAddress
    */
-  public Employee(java.lang.CharSequence id, java.lang.CharSequence firstName, java.lang.CharSequence middleName, java.lang.CharSequence lastName, java.lang.CharSequence emailId) {
+  public Employee(java.lang.CharSequence id, java.lang.CharSequence firstName, java.lang.CharSequence middleName, java.lang.CharSequence lastName, java.lang.CharSequence emailAddress) {
     this.id = id;
     this.firstName = firstName;
     this.middleName = middleName;
     this.lastName = lastName;
-    this.emailId = emailId;
+    this.emailAddress = emailAddress;
   }
 
   @Override
@@ -115,7 +115,7 @@ public class Employee extends org.apache.avro.specific.SpecificRecordBase implem
     case 1: return firstName;
     case 2: return middleName;
     case 3: return lastName;
-    case 4: return emailId;
+    case 4: return emailAddress;
     default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
   }
@@ -129,7 +129,7 @@ public class Employee extends org.apache.avro.specific.SpecificRecordBase implem
     case 1: firstName = (java.lang.CharSequence)value$; break;
     case 2: middleName = (java.lang.CharSequence)value$; break;
     case 3: lastName = (java.lang.CharSequence)value$; break;
-    case 4: emailId = (java.lang.CharSequence)value$; break;
+    case 4: emailAddress = (java.lang.CharSequence)value$; break;
     default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
   }
@@ -203,20 +203,20 @@ public class Employee extends org.apache.avro.specific.SpecificRecordBase implem
   }
 
   /**
-   * Gets the value of the 'emailId' field.
-   * @return The value of the 'emailId' field.
+   * Gets the value of the 'emailAddress' field.
+   * @return The value of the 'emailAddress' field.
    */
-  public java.lang.CharSequence getEmailId() {
-    return emailId;
+  public java.lang.CharSequence getEmailAddress() {
+    return emailAddress;
   }
 
 
   /**
-   * Sets the value of the 'emailId' field.
+   * Sets the value of the 'emailAddress' field.
    * @param value the value to set.
    */
-  public void setEmailId(java.lang.CharSequence value) {
-    this.emailId = value;
+  public void setEmailAddress(java.lang.CharSequence value) {
+    this.emailAddress = value;
   }
 
   /**
@@ -264,7 +264,7 @@ public class Employee extends org.apache.avro.specific.SpecificRecordBase implem
     private java.lang.CharSequence firstName;
     private java.lang.CharSequence middleName;
     private java.lang.CharSequence lastName;
-    private java.lang.CharSequence emailId;
+    private java.lang.CharSequence emailAddress;
 
     /** Creates a new Builder */
     private Builder() {
@@ -293,8 +293,8 @@ public class Employee extends org.apache.avro.specific.SpecificRecordBase implem
         this.lastName = data().deepCopy(fields()[3].schema(), other.lastName);
         fieldSetFlags()[3] = other.fieldSetFlags()[3];
       }
-      if (isValidValue(fields()[4], other.emailId)) {
-        this.emailId = data().deepCopy(fields()[4].schema(), other.emailId);
+      if (isValidValue(fields()[4], other.emailAddress)) {
+        this.emailAddress = data().deepCopy(fields()[4].schema(), other.emailAddress);
         fieldSetFlags()[4] = other.fieldSetFlags()[4];
       }
     }
@@ -321,8 +321,8 @@ public class Employee extends org.apache.avro.specific.SpecificRecordBase implem
         this.lastName = data().deepCopy(fields()[3].schema(), other.lastName);
         fieldSetFlags()[3] = true;
       }
-      if (isValidValue(fields()[4], other.emailId)) {
-        this.emailId = data().deepCopy(fields()[4].schema(), other.emailId);
+      if (isValidValue(fields()[4], other.emailAddress)) {
+        this.emailAddress = data().deepCopy(fields()[4].schema(), other.emailAddress);
         fieldSetFlags()[4] = true;
       }
     }
@@ -488,41 +488,41 @@ public class Employee extends org.apache.avro.specific.SpecificRecordBase implem
     }
 
     /**
-      * Gets the value of the 'emailId' field.
+      * Gets the value of the 'emailAddress' field.
       * @return The value.
       */
-    public java.lang.CharSequence getEmailId() {
-      return emailId;
+    public java.lang.CharSequence getEmailAddress() {
+      return emailAddress;
     }
 
 
     /**
-      * Sets the value of the 'emailId' field.
-      * @param value The value of 'emailId'.
+      * Sets the value of the 'emailAddress' field.
+      * @param value The value of 'emailAddress'.
       * @return This builder.
       */
-    public ir.bigz.kafka.service_registry.dto.Employee.Builder setEmailId(java.lang.CharSequence value) {
+    public ir.bigz.kafka.service_registry.dto.Employee.Builder setEmailAddress(java.lang.CharSequence value) {
       validate(fields()[4], value);
-      this.emailId = value;
+      this.emailAddress = value;
       fieldSetFlags()[4] = true;
       return this;
     }
 
     /**
-      * Checks whether the 'emailId' field has been set.
-      * @return True if the 'emailId' field has been set, false otherwise.
+      * Checks whether the 'emailAddress' field has been set.
+      * @return True if the 'emailAddress' field has been set, false otherwise.
       */
-    public boolean hasEmailId() {
+    public boolean hasEmailAddress() {
       return fieldSetFlags()[4];
     }
 
 
     /**
-      * Clears the value of the 'emailId' field.
+      * Clears the value of the 'emailAddress' field.
       * @return This builder.
       */
-    public ir.bigz.kafka.service_registry.dto.Employee.Builder clearEmailId() {
-      emailId = null;
+    public ir.bigz.kafka.service_registry.dto.Employee.Builder clearEmailAddress() {
+      emailAddress = null;
       fieldSetFlags()[4] = false;
       return this;
     }
@@ -536,7 +536,7 @@ public class Employee extends org.apache.avro.specific.SpecificRecordBase implem
         record.firstName = fieldSetFlags()[1] ? this.firstName : (java.lang.CharSequence) defaultValue(fields()[1]);
         record.middleName = fieldSetFlags()[2] ? this.middleName : (java.lang.CharSequence) defaultValue(fields()[2]);
         record.lastName = fieldSetFlags()[3] ? this.lastName : (java.lang.CharSequence) defaultValue(fields()[3]);
-        record.emailId = fieldSetFlags()[4] ? this.emailId : (java.lang.CharSequence) defaultValue(fields()[4]);
+        record.emailAddress = fieldSetFlags()[4] ? this.emailAddress : (java.lang.CharSequence) defaultValue(fields()[4]);
         return record;
       } catch (org.apache.avro.AvroMissingFieldException e) {
         throw e;
@@ -577,7 +577,7 @@ public class Employee extends org.apache.avro.specific.SpecificRecordBase implem
 
     out.writeString(this.lastName);
 
-    out.writeString(this.emailId);
+    out.writeString(this.emailAddress);
 
   }
 
@@ -594,7 +594,7 @@ public class Employee extends org.apache.avro.specific.SpecificRecordBase implem
 
       this.lastName = in.readString(this.lastName instanceof Utf8 ? (Utf8)this.lastName : null);
 
-      this.emailId = in.readString(this.emailId instanceof Utf8 ? (Utf8)this.emailId : null);
+      this.emailAddress = in.readString(this.emailAddress instanceof Utf8 ? (Utf8)this.emailAddress : null);
 
     } else {
       for (int i = 0; i < 5; i++) {
@@ -616,7 +616,7 @@ public class Employee extends org.apache.avro.specific.SpecificRecordBase implem
           break;
 
         case 4:
-          this.emailId = in.readString(this.emailId instanceof Utf8 ? (Utf8)this.emailId : null);
+          this.emailAddress = in.readString(this.emailAddress instanceof Utf8 ? (Utf8)this.emailAddress : null);
           break;
 
         default:

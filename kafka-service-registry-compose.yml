@@ -1,7 +1,7 @@
 services:
-  kafka_b:
-    container_name: kafka_b
-    hostname: kafka_b
+  kafka_broker:
+    container_name: kafka_broker
+    hostname: kafka_broker
     image: bitnami/kafka:3.8.1
     ports:
       - '9092:9092'
@@ -14,7 +14,7 @@ services:
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:9092,EXTERNAL://kafka_b:9094
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:9092,EXTERNAL://kafka_broker:9094
       - KAFKA_CFG_NODE_ID=0
       - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@127.0.0.1:9093
       - ALLOW_PLAINTEXT_LISTENER=yes
@@ -25,9 +25,10 @@ services:
   kafka-ui:
     container_name: kafka-ui
     hostname: kafka-ui
-    image: provectuslabs/kafka-ui:v0.7.2
+    # image: provectuslabs/kafka-ui:v0.7.2
+    image: kafbat/kafka-ui:main
     depends_on: 
-      - kafka_b
+      - kafka_broker
     ports:
       - '8080:8080'
     volumes:
@@ -35,19 +36,25 @@ services:
     environment:
       DYNAMIC_CONFIG_ENABLED: 'true'
       LOGGING_LEVEL_ROOT: 'DEBUG'
+      KAFKA_CLUSTERS_0_NAME: kafka-cluster
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka_broker:9094
+      KAFKA_CLUSTERS_0_SCHEMAREGISTRY: http://schema-registry:8081
     networks:
       - kafka-network
   
   schema-registry:
-    image: confluentinc/cp-schema-registry:latest
+    container_name: schema-registry
+    # image: confluentinc/cp-schema-registry:latest
+    image: confluentinc/cp-schema-registry:7.7.1
     hostname: schema-registry
     depends_on:
-      - kafka_b
+      - kafka_broker
     ports:
       - "8081:8081"
     environment:
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka_b:9094,PLAINTEXT_INTERNAL://localhost:29092
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka_broker:9094,PLAINTEXT_INTERNAL://127.0.0.1:29092
+      SCHEMA_REGISTRY_LISTENERS: http://schema-registry:8081,http://127.0.0.1:8081
     networks:
       - kafka-network
 

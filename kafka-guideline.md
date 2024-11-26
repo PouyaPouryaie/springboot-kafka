@@ -1,8 +1,8 @@
 
 # Run Kafka by using Docker & docker-compose
 1. To run Kafka you could use `Kafka-compose.yml` file.
-3. create the `docker-volume` folder as a volume att the location where `Kafka-compose.yml` is exist 
-4. open a terminal at the location where the `Kafka-compose.yml` file is exist there
+3. create the `docker-volume` folder as a volume att the location where `Kafka-compose.yml` is existed
+4. open a terminal at the location where the `Kafka-compose.yml` file is existed there
 5. run below command at the terminal
 ```bash
 docker compose -f Kafka-compose.yml up -d
@@ -19,7 +19,7 @@ docker exec -it kafka-sample bash
 Kafka-UI, a user interface tool developed by Provectus Labs, is used in this project to facilitate user interaction with Kafka. <br>
 
 ### Step 1: Run the Kafka-ui
-### First Approach - use compose file : 
+### First Approach - use compose file :
     1. To run Kafka you could use `Kafka-ui-compose.yml` file.
     2. create the `kafka-ui-volume` folder as a volume att the location where `Kafka-ui-compose.yml` is exist 
     3. open a terminal at the location where the `Kafka-ui-compose.yml` file is exist there
@@ -142,8 +142,8 @@ docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-topics.sh \
 - Create Topic Programmatically: defining a bean from NewTopic and set name, partition, and replication for the topic
 - For consuming, you should define a group for consumer
     - by annotation: `@KafkaListener(topics = "kafka-spring-topic", groupId = "spring-group")`
-      - This annotation could be used on top of class or method
-      - Class-level annotation is suitable when you want to group related message handling logic together. <br> Messages from these topics will be distributed to the methods within the class based on their parameters
+        - This annotation could be used on top of class or method
+        - Class-level annotation is suitable when you want to group related message handling logic together. <br> Messages from these topics will be distributed to the methods within the class based on their parameters
     - by properties: `kafka.consumer.group-id=spring-group`
 - If you create just one instance for consuming data. the consumer will connect to all the partitions of that topic
 - Assigning partitions to the multi consumer is managed by kafka by default, so it choose which partition connect <br> to which consumer
@@ -151,8 +151,8 @@ docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-topics.sh \
 - If during the process, the consumer is dead, we will have Lag, and we need to republish Lag data to consumer <br> after it is lived
 - Serialize & Deserialize
     - If you want to send Java object (DTO), you need to define both serializer at producer and deserializer at consumer side
-      - Your Java Objects should be followed Pojo structure (Getter, Setter, No Args Constructor, All Args Constructor)
-    - For handle deserialization errors, you can use `ErrorHandlingDeserializer`, which is provided by spring. <br> it is a wrapper around your custom deserializer 
+        - Your Java Objects should be followed Pojo structure (Getter, Setter, No Args Constructor, All Args Constructor)
+    - For handle deserialization errors, you can use `ErrorHandlingDeserializer`, which is provided by spring. <br> it is a wrapper around your custom deserializer
     - The trusted package path at consumer should be the same path package at producer
     1) Use Properties file
         - Example
@@ -222,17 +222,17 @@ docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-topics.sh \
                 return factory;
             }
         ```
-- Message Routing: 
-    - Producer: if you want to send message to the specific partition, you need to mention that partition number as <br> a parameter at the `send` method of `kafkaTemplate`. <br> 
-    example: send for partition 3 -> `template.send("kafka-topic", 3, null, eventMessageObject)`
+- Message Routing:
+    - Producer: if you want to send message to the specific partition, you need to mention that partition number as <br> a parameter at the `send` method of `kafkaTemplate`. <br>
+      example: send for partition 3 -> `template.send("kafka-topic", 3, null, eventMessageObject)`
     - consumer: you need to define `topicPartitions` at `@kafkaListener` <br>
-    example: read from partition 3 -> `@kafkaListener(topicPartitions = {@TopicPartition(topic = "kafka-topic", partitions = {"2"})})`
+      example: read from partition 3 -> `@kafkaListener(topicPartitions = {@TopicPartition(topic = "kafka-topic", partitions = {"2"})})`
 - Retry Strategy:
     - Establish a retry mechanism for Kafka messages. Define the maximum number of retries before routing undeliverable <br> messages to the `Dead Letter Topic` (DLT is a topic that store all the failed message)
     - It prevents lost message. (reliable message process)
     - You just need to add `@RetryableTopic` on top of your KafkaListener and also define a method that annotates with `@DltHandler`
-        - `@RetryableTopic` is non-blocking approach and can imporve performance
-        - but there are some disadvantage like change order of a messsage or risk of message duplication
+        - `@RetryableTopic` is non-blocking approach and can improve performance
+        - but there are some disadvantage like change order of a message or risk of message duplication
         - There are Three strategy for DLT
             - `FAIL_ON_ERROR`: strategy when the DLT consumer won’t try to reprocess an event in case of failure
             - `ALWAYS_RETRY_ON_ERROR`: strategy ensures that the DLT consumer tries to reprocess the event in case of failure
@@ -245,13 +245,18 @@ docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-topics.sh \
             // put logic here
         } 
         ```
-- Schema Registery (Avro Schema)
+- Schema Registry (Avro Schema)
     - to ensure that new data can be consumed by older consumers that were designed to work with the old schema
     - the requirements which we need are an Avro Maven plugin to define object from Avro Schema file, <br> and Avro Serializer and Deserializer for serialize and deserialize
-    - the schema registery is going to provide a way to store, retrive and evolve schema in a consistent <br> manner between producer and consumer
+    - the schema registry is going to provide a way to store, retrieve and evolve schema in a consistent <br> manner between producer and consumer
     - To check subjects in service registry: http://localhost:8081/subjects
     - To check entity: `http://localhost:8081/subjects/<topic-name>-value/versions/latest`
-    - when adding a new field to a schema, you should add a default value for that field in `avsc` file.
+    - when adding a new field to a schema, for `Backward compatibility` you should add a default value for that field in `avsc` file.
+    - each time after updating `avsc` file, the project needs to compile again to reflects changes on the entity
+    - Configs:
+    - - `SCHEMA_REGISTRY_URL_CONFIG`: The URL for connecting to Schema Registry
+      - `SPECIFIC_AVRO_READER_CONFIG`: It implies that the Avro consumer (e.g. Kafka consumer) is configured to deserialize messages into specific Avro classes generated from an Avro schema
+      - `AUTO_REGISTER_SCHEMAS`: To determines whether the schema registry should automatically register new schemas when it encounters them (__should be false at Production mode__)
 - RoutingKafkaTemplate
     - using RoutingKafkaTemplate to serialize data based on different topic name
     - you need to define a bean to return `Map<Pattern, ProducerFactory<Object, Object>>` which is contains different type of <br> DefaultKafkaProducerFactory based on Pattern that you are defined like `Pattern.compile("message-.*")`
@@ -298,10 +303,10 @@ docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-topics.sh \
     - This ensures the message is consumed, and won’t be delivered to the current listener again.
     - To implement a **Retry logic** for message processing in Kafka, we need to select an **AckMode**.
         - We shouldn’t set the ack mode to `AckMode.BATCH` or `AckMode.TIME` for Retry logic,  because the consumer won’t redeliver all messages in the batch or time window to itself if an error occurs while processing a message
-    - Types: 
+    - Types:
         1. `Auto-commit`, 2. `After-processing`, 3. `Manual`
-    - Serveral ack modes available that we can configure:
-        
+    - Several ack modes available that we can configure:
+
         1. AckMode.RECORD: In this after-processing mode, the consumer sends an acknowledgment for each message it processes.
         2. AckMode.BATCH: In this manual mode, the consumer sends an acknowledgment for a batch of messages, rather than for each message.
         3. AckMode.COUNT: In this manual mode, the consumer sends an acknowledgment after it has processed a specific number of messages.
@@ -334,16 +339,16 @@ docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-topics.sh \
             return factory;
         }
     ```
-    
+
 
 
 
 ## Hints
-- For test consumer part, you can define multi method instead of multi instance to connect to kafka 
+- For test consumer part, you can define multi method instead of multi instance to connect to kafka
 - The method annotated with the @DltHandler annotation must be placed in the same class as the @KafkaListener annotated method
 
 # Keyword
-- Consumer rebalancing
+- Consumer re-balancing
 
 
 # Resource
