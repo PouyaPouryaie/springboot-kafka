@@ -53,7 +53,7 @@ services:
       - "8081:8081"
     environment:
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka_broker:9094,PLAINTEXT_INTERNAL://127.0.0.1:29092
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka_broker:9094
       SCHEMA_REGISTRY_LISTENERS: http://schema-registry:8081,http://127.0.0.1:8081
     networks:
       - kafka-network
