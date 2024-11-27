@@ -88,6 +88,15 @@ docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-
 docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-broker-api-versions.sh --version
 ```
 
+## Check kafka Cluster
+```bash
+kafka-metadata-quorum.sh --bootstrap-controller <localhost>:<controller-IP> describe --status
+
+# example: 
+# The controller listener config is: CONTROLLER://:9093 at kafka-cluster-compose file, so the command should be write like below:
+kafka-metadata-quorum.sh --bootstrap-controller http://127.0.0.1:9093 describe --status
+```
+
 ## Produce & Consume Data with Kafka-console
 ```bash
 # Producer

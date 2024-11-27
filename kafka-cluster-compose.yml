@@ -1,0 +1,93 @@
+services:
+  kafka-c-1:
+    container_name: kafka-c-1
+    hostname: kafka-c-1
+    image: bitnami/kafka:3.8.1
+    ports:
+      - '9096:9096'
+    volumes:
+      - kafka_volume_one:/bitnami/kafka
+    environment:
+      - KAFKA_ENABLE_KRAFT=yes # use KRAFT instead of zookeeper for Quorum_lead
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9090,CONTROLLER://:9093,EXTERNAL://:9096
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-c-1:9090,EXTERNAL://kafka-c-1:9096
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_KRAFT_CLUSTER_ID=kafka-cluster
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-c-1:9093,2@kafka-c-2:9093,3@kafka-c-3:9093
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true # Creating topic if the topic does not exist
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    networks:
+      - kafka-network
+  kafka-c-2:
+    container_name: kafka-c-2
+    hostname: kafka-c-2
+    image: bitnami/kafka:3.8.1
+    ports:
+      - '9097:9097'
+    volumes:
+      - kafka_volume_two:/bitnami/kafka
+    environment:
+      - KAFKA_ENABLE_KRAFT=yes # use KRAFT instead of zookeeper for Quorum_lead
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9090,CONTROLLER://:9093,EXTERNAL://:9097
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-c-2:9090,EXTERNAL://kafka-c-2:9097
+      - KAFKA_CFG_NODE_ID=2
+      - KAFKA_KRAFT_CLUSTER_ID=kafka-cluster
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-c-1:9093,2@kafka-c-2:9093,3@kafka-c-3:9093
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true # Creating topic if the topic does not exist
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    networks:
+      - kafka-network
+  kafka-c-3:
+    container_name: kafka-c-3
+    hostname: kafka-c-3
+    image: bitnami/kafka:3.8.1
+    ports:
+      - '9098:9098'
+    volumes:
+      - kafka_volume_three:/bitnami/kafka
+    environment:
+      - KAFKA_ENABLE_KRAFT=yes # use KRAFT instead of zookeeper for Quorum_lead
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9090,CONTROLLER://:9093,EXTERNAL://:9098
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-c-3:9090,EXTERNAL://kafka-c-3:9098
+      - KAFKA_CFG_NODE_ID=3
+      - KAFKA_KRAFT_CLUSTER_ID=kafka-cluster
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-c-1:9093,2@kafka-c-2:9093,3@kafka-c-3:9093
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true # Creating topic if the topic does not exist
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    networks:
+      - kafka-network
+
+volumes:
+  kafka_volume_one:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/kafka-cluster/volumes/one
+  kafka_volume_two:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/kafka-cluster/volumes/two
+  kafka_volume_three:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/kafka-cluster/volumes/three
+
+
+networks:
+  kafka-network:
+    name: kafka-network
+    driver: bridge
