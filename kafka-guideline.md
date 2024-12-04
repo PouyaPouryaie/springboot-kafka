@@ -1,8 +1,28 @@
 
 # Run Kafka by using Docker & docker-compose
+
+## Using Docker Command
+```bash
+docker run -d --name kafka-sample --hostname kafka-sample \
+    --network kafka-network \
+    -e KAFKA_ENABLE_KRAFT=yes \
+    -e KAFKA_CFG_PROCESS_ROLES=controller,broker \
+    -e KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094 \
+    -e KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT \
+    -e KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:9092,EXTERNAL://kafka-sample:9094 \
+    -e KAFKA_CFG_NODE_ID=0 \
+    -e KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@127.0.0.1:9093 \
+    -e KAFKA_AUTO_CREATE_TOPICS_ENABLE=true \
+    -e KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER \
+    -e ALLOW_PLAINTEXT_LISTENER=yes \
+    -p 9092:9092 \
+    -p 9094:9094 \
+    bitnami/kafka:3.8.1
+```
+## Using Docker Compose
 1. To run Kafka you could use `Kafka-compose.yml` file.
-3. create the `docker-volume` folder as a volume att the location where `Kafka-compose.yml` is existed
-4. open a terminal at the location where the `Kafka-compose.yml` file is existed there
+3. create the `docker-volume` folder as a volume at the location where `Kafka-compose.yml` exists.
+4. open a terminal at the location where the `Kafka-compose.yml` file has existed there
 5. run below command at the terminal
 ```bash
 docker compose -f Kafka-compose.yml up -d
