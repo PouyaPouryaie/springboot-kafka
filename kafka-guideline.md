@@ -137,11 +137,32 @@ kafka-console-producer.sh --broker-list 127.0.0.1:9092 --topic <topic-name> <pat
 # Example:
 kafka-console-producer.sh --broker-list localhost:9092 --topic pouya-topic </Users/data/users.csv
 ```
+- To specify the key separator character, the flags to enable printing for both the key and the value, as well as the key and value deserializer
+```bash
+kafka-console-consumer.sh --bootstrap-server localhost:9092 \
+--topic <topic-name> \
+--group <group-id> \
+--property print.key=true \
+--property print.value=true \
+--property key.separator=":" \
+--property print.timestamp=true \
+--value-deserializer org.apache.kafka.common.serialization.StringDeserializer \
+--key-deserializer org.apache.kafka.common.serialization.StringDeserializer
+```
 
-- Log Compaction
+## Kafka configs
+- To update a Kafka topic's configuration (e.g., retention settings, number of partitions), use the `kafka-configs.sh` tool.
 ```bash
 kafka-configs.sh --alter --entity-type topics --entity-name <topic-name> 
 --add-config 'cleanup.policy=compact' --bootstrap-server <broker_host>:<broker_port>
+```
+## Kafka logs
+- For reading logs and debugging a specific Kafka topic, use the `kafka-dump-log.sh` tool to inspect the contents of its log segments
+```bash
+kafka-dump-log.sh --files /bitnami/kafka/data/<topic-name>-<partition-number>/<file-name>.log
+
+# Example
+kafka-dump-log.sh --files /bitnami/kafka/data/part-three-2/00000000000000000000.log
 ```
 
 
