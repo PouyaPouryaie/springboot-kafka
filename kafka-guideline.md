@@ -390,6 +390,18 @@ docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-topics.sh \
         }
     ```
 
+- Idempotent
+    - Producer side:
+        - `enable.idempotence=true`
+        - set `transactional.id` to ensures that messages are sent atomically and deduplicated by the broker
+        - defining `KafkaTransactionManager` to manages transaction boundaries for the producer.
+        - use `@Transactional` or use `executeInTransaction` of KafkaTemplate to produce message into a single transaction
+    - Consumer side:
+        - set `isolation.level=read_committed`
+        - set `enable.auto.commit=false` to prevent auto commit (This can lead to a situation where offsets are committed before the message is fully processed, resulting in potential duplicate processing during retries)
+        - set `AckMode` to `AckMode.MANUAL_IMMEDIATE` to define type of commit offsets for kafka
+        - use Manual Acknowledgment (e.g. `acknowledgment.acknowledge()`) in service to commit offset after successful processing
+
 
 
 
