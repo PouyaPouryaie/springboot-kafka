@@ -25,13 +25,14 @@ public class KafkaMessagePublisher {
         this.template = template;
     }
 
+//    using transaction annotation
 //    @Transactional
 //    public void sendMessageToTopic(Customer customer) {
 //        var customerMessage = new Message<>(customer);
-//        CompletableFuture<SendResult<String, Object>> future = template.send("message-customer-topic", customerMessage);
+//        CompletableFuture<SendResult<String, Object>> future = template.send(kafkaProperties.getTopicName(), customerMessage);
 //        future.whenComplete((result, ex) -> {
 //            if (ex == null) {
-//                log.info("Sent Message= {} to topic= {} with offset= {}", customerMessage, "message-customer-topic", result.getRecordMetadata().offset());
+//                log.info("Sent Message= {} to topic= {} with offset= {}", customerMessage, kafkaProperties.getTopicName(), result.getRecordMetadata().offset());
 //            } else {
 //                log.error("Unable to send Message= {} due to {}", customerMessage, ex.getMessage());
 //            }

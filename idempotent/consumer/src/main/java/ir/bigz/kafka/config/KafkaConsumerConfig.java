@@ -47,6 +47,7 @@ public class KafkaConsumerConfig {
         props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class.getName());
         props.put(JsonDeserializer.TRUSTED_PACKAGES, kafkaProperties.getTrustedPackage());
         props.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaProperties.getDefaultConsumerGroupId());
+        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
         props.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_committed");
         return new KafkaConfigDto(props);
     }
