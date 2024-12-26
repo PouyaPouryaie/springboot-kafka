@@ -25,7 +25,6 @@ public class KafkaClassListener {
 
     private static final Logger log = LoggerFactory.getLogger(KafkaClassListener.class);
     private final ConcurrentMap<String, String> processKeys;
-    private static int random_fail = 0;
 
     public KafkaClassListener(@Qualifier("processKeys") ConcurrentMap<String, String> processKeys) {
         this.processKeys = processKeys;
@@ -38,11 +37,6 @@ public class KafkaClassListener {
 
         if(!processKeys.containsKey(key)) {
             try {
-
-                if(random_fail % 3 == 0) {
-                    throw new Exception(String.format("random failed for key: %s, random-failed: %s", key, random_fail));
-                }
-
                 log.info("received message: {}", message.toString());
                 headers.keySet().forEach(header -> log.info("{}:{}", header, headers.get(header)));
                 processKeys.put(key, "processed");
@@ -55,7 +49,5 @@ public class KafkaClassListener {
             log.info("Duplicate message detected and ignored, key= {}", key);
             ack.acknowledge();
         }
-
-        random_fail += 1;
     }
 }

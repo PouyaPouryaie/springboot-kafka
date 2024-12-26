@@ -6,9 +6,18 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.annotation.PartitionOffset;
+import org.springframework.kafka.annotation.RetryableTopic;
 import org.springframework.kafka.annotation.TopicPartition;
+import org.springframework.kafka.annotation.PartitionOffset;
+import org.springframework.kafka.annotation.DltHandler;
+import org.springframework.kafka.retrytopic.DltStrategy;
 import org.springframework.kafka.support.Acknowledgment;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.MessageHeaders;
+import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.messaging.handler.annotation.Headers;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ConcurrentMap;
@@ -23,12 +32,17 @@ public class KafkaMethodListener {
 
     private final ConcurrentMap<String, String> processKeys;
 
-    private static int random_fail = 0;
-
     public KafkaMethodListener(ConcurrentMap<String, String> processKeys) {
         this.processKeys = processKeys;
     }
 
+    @RetryableTopic(
+            attempts = "3",
+            backoff = @Backoff(delay = 3000, multiplier = 1.5, maxDelay = 15000),
+            dltStrategy = DltStrategy.FAIL_ON_ERROR,
+            exclude = {NullPointerException.class}
+//            include = {SocketTimeoutException.class, IOException.class} // you just can use one of exclude or include simultaneously
+    )
     @KafkaListener(topics = "idempotence-topic", topicPartitions = {
             @TopicPartition(topic = "idempotence-topic",
                     partitionOffsets = { @PartitionOffset(partition = "2", initialOffset = "0")})
@@ -39,11 +53,6 @@ public class KafkaMethodListener {
 
         if(!processKeys.containsKey(key)) {
             try {
-
-                if(random_fail % 3 == 0) {
-                    throw new Exception(String.format("random failed for key: %s, random-failed: %s", key, random_fail));
-                }
-
                 Message<Customer> message = record.value();
                 log.info("received message= {}", message);
                 processKeys.put(key, "processed");
@@ -59,8 +68,19 @@ public class KafkaMethodListener {
             ack.acknowledge(); // Acknowledge duplicates
         }
 
-        random_fail += 1;
+    }
 
+    @DltHandler
+    public void sendToDlt(@Payload Message<Customer> message,
+                          @Headers MessageHeaders headers,
+                          @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
+                          @Header(KafkaHeaders.OFFSET) long offset,
+                          @Header(KafkaHeaders.RECEIVED_PARTITION) int partition) {
+
+        String receivedKey = String.valueOf(headers.get("kafka_receivedMessageKey"));
+
+        log.info("DLT Received : {} , from {} , partition {}, offset {}, key {}",
+                message.getMessage(), topic, partition, offset, receivedKey);
     }
 
     public CountDownLatch getLatch() {
