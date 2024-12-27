@@ -47,7 +47,7 @@ The project demonstrates essential Kafka functionalities through code examples:
 **7. CustomizeDeserializer**: Demonstrating how to define custom deserializer and use it. you can find it under `producer` at `advance-producer-consumer` project.<br>
 **8. CustomizeContainerFactory**: Demonstrating how to define a customize container factory and attach to specific `@KafkaListener`. you can find it under `producer` at `advance-producer-consumer` project.<br>
 **9. Batch Listener**: Demonstrating how to enable batch listener and customize it. the name of the method is `kafkaBatchListenerContainerFactory`. you can find it under `consumer` at `advance-producer-consumer` project.<br>
-**10. Idempotence**: A demonstration of how to configure Kafka producers and consumers to ensure idempotent message delivery and prevent duplicate message processing. you can find it at `idempotent` project. also you can check `Springboot & Kafka` section at `kafka-guideline` to get steps you need to use to add idempotency to your project.<br>
+**10. Idempotence & Exactly-Once Semantics (EOS)**: A demonstration of how to configure Kafka producers and consumers to ensure idempotent message delivery and prevent duplicate message processing. you can find it at `idempotent` project. also you can check `Springboot & Kafka` section at `kafka-guideline` to get steps you need to use to add idempotency to your project.<br>
 
 ### Contributing
 

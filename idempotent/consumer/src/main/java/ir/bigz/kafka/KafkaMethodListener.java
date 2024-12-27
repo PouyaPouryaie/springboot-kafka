@@ -41,7 +41,6 @@ public class KafkaMethodListener {
             backoff = @Backoff(delay = 3000, multiplier = 1.5, maxDelay = 15000),
             dltStrategy = DltStrategy.FAIL_ON_ERROR,
             exclude = {NullPointerException.class}
-//            include = {SocketTimeoutException.class, IOException.class} // you just can use one of exclude or include simultaneously
     )
     @KafkaListener(topics = "idempotence-topic", topicPartitions = {
             @TopicPartition(topic = "idempotence-topic",
