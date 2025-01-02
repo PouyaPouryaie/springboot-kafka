@@ -46,7 +46,7 @@ public class KafkaConfigMap {
         propsMap.put(ProducerConfig.RETRY_BACKOFF_MS_CONFIG, "1000");
         propsMap.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true");
         propsMap.put(ProducerConfig.ACKS_CONFIG, "all");
-        propsMap.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, "5"); // set it to One if you need Ordering
+        propsMap.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, "5"); // set it to One if Ordering of messages are important
         return new KafkaConfigMap(propsMap);
     }
 
