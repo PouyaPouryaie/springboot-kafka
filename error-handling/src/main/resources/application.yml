@@ -14,6 +14,18 @@ logging:
 
 app:
   topic:
-    name: kafka-error-handle
     custom:
       name: kafka-blocking-retry
+kafka:
+  properties:
+    bootstrap-server: 172.21.0.2:9092
+    retries: 3
+    delivery-timeout: 30000
+    retry-backoff: 1000
+    enable-idempotence: true
+    acks: all
+    max-in-flight-requests-per-connection: 5
+    trusted-package: ir.bigz.kafka.dto
+    default-consumer-group-id: kafka-error-group
+    topic-name: kafka-error-handle
+    auto-offset-reset: latest

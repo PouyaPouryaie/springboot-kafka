@@ -18,7 +18,7 @@ public class KafkaMessagePublisher {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    @Value("${app.topic.name}")
+    @Value("${kafka.properties.topic-name}")
     private String defaultTopicName;
 
     public KafkaMessagePublisher(KafkaTemplate<String, Object> kafkaTemplate) {

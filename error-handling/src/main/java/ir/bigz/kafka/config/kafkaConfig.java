@@ -1,16 +1,20 @@
 package ir.bigz.kafka.config;
 
+import ir.bigz.kafka.config.KafkaConfigMap.KafkaType;
 import ir.bigz.kafka.exception.ConsumerException;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.config.TopicBuilder;
-import org.springframework.kafka.core.*;
+import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.core.DefaultKafkaProducerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.core.ConsumerFactory;
+import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.DefaultErrorHandler;
@@ -25,14 +29,17 @@ public class kafkaConfig {
 
     Logger log = LoggerFactory.getLogger(kafkaConfig.class);
 
-    @Value("${app.topic.name}")
-    private String topicName;
+    private final KafkaConfigMap kafkaConfigMap;
+    private final KafkaProperties kafkaProperties;
 
-    KafkaConfigMap kafkaConfigMap = KafkaConfigMap.getKafkaConfigMap();
+    public kafkaConfig(KafkaConfigMap kafkaConfigMap, KafkaProperties kafkaProperties) {
+        this.kafkaConfigMap = kafkaConfigMap;
+        this.kafkaProperties = kafkaProperties;
+    }
 
     @Bean
     public NewTopic createTopicWithTopicBuilder() {
-        return TopicBuilder.name(topicName)
+        return TopicBuilder.name(kafkaProperties.getTopicName())
                 .partitions(3)
                 .replicas(1)
                 .build();
@@ -40,7 +47,7 @@ public class kafkaConfig {
 
     @Bean
     public ProducerFactory<String, Object> producerFactory() {
-        return new DefaultKafkaProducerFactory<>(kafkaConfigMap.getPropsMap());
+        return new DefaultKafkaProducerFactory<>(kafkaConfigMap.getKafkaConfig(KafkaType.PRODUCER));
     }
 
     @Bean
@@ -51,7 +58,7 @@ public class kafkaConfig {
 
     @Bean
     public ConsumerFactory<String, Object> consumerFactory() {
-        return new DefaultKafkaConsumerFactory<>(kafkaConfigMap.getPropsMap());
+        return new DefaultKafkaConsumerFactory<>(kafkaConfigMap.getKafkaConfig(KafkaType.CONSUMER));
     }
 
     @Bean
@@ -76,9 +83,9 @@ public class kafkaConfig {
     @Bean
     public DefaultErrorHandler errorHandler() {
         BackOff backOff = new FixedBackOff(1000, 3);
-        DefaultErrorHandler customErrorHandler = new DefaultErrorHandler( (consumerRecord, exception) -> {
+        DefaultErrorHandler customErrorHandler = new DefaultErrorHandler((consumerRecord, exception) -> {
             // put your logic to execute when all the retry attempts are exhausted
-            log.error(" Received: {} , after {} attempts, exception: {}",consumerRecord.value(), 3, exception.getMessage());
+            log.error(" Received: {} , after {} attempts, exception: {}", consumerRecord.value(), 3, exception.getMessage());
         }, backOff);
         customErrorHandler.addRetryableExceptions(IOException.class, ConsumerException.class);
         customErrorHandler.addNotRetryableExceptions(NullPointerException.class);

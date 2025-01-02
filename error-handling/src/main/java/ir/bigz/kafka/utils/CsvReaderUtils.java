@@ -3,6 +3,7 @@ package ir.bigz.kafka.utils;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 import ir.bigz.kafka.dto.User;
+import ir.bigz.kafka.exception.PublisherException;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.BufferedReader;
@@ -11,7 +12,6 @@ import java.io.InputStreamReader;
 import java.util.List;
 
 public class CsvReaderUtils {
-
 
     public static List<User> readDataFromCsv() {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader
@@ -22,9 +22,7 @@ public class CsvReaderUtils {
 
             return csvToBean.parse();
         } catch (IOException e) {
-            e.printStackTrace();
-            // Handle the exception as needed
-            return null;
+            throw new PublisherException(String.format("Raise an Error during Parse the CSV file: [%s]", e.getMessage()));
         }
     }
 }

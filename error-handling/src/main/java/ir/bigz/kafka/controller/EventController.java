@@ -2,11 +2,10 @@ package ir.bigz.kafka.controller;
 
 import ir.bigz.kafka.dto.User;
 import ir.bigz.kafka.publisher.KafkaMessagePublisher;
-import ir.bigz.kafka.utils.CsvReaderUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -14,6 +13,9 @@ import java.util.Optional;
 public class EventController {
 
     KafkaMessagePublisher kafkaMessagePublisher;
+
+    @Value("${app.topic.custom.name}")
+    private String retryBlockTopicName;
 
     public EventController(KafkaMessagePublisher kafkaMessagePublisher) {
         this.kafkaMessagePublisher = kafkaMessagePublisher;
@@ -33,7 +35,7 @@ public class EventController {
 
     @GetMapping("/retry-blocking")
     public ResponseEntity<?> publishBulkMessageForRetryBlock() {
-        kafkaMessagePublisher.sendCSVFile(Optional.of("kafka-blocking-retry"));
+        kafkaMessagePublisher.sendCSVFile(Optional.of(retryBlockTopicName));
         return ResponseEntity.ok("Message published successfully");
     }
 }
