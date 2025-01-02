@@ -12,6 +12,7 @@ import org.springframework.kafka.annotation.RetryableTopic;
 import org.springframework.kafka.retrytopic.DltStrategy;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Service;
 
@@ -53,7 +54,7 @@ public class NonBlockingKafkaMessageConsumer {
     }
 
     @DltHandler
-    public void sendToDlt(User user,
+    public void sendToDlt(@Payload User user,
                           @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
                           @Header(KafkaHeaders.OFFSET) long offset) {
         log.info("DLT Received : {} , from {} , offset {}",user.getFirstName(),topic,offset);

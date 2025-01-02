@@ -278,7 +278,16 @@ docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-topics.sh \
     - consumer: you need to define `topicPartitions` at `@kafkaListener` <br>
       example: read from partition 3 -> `@kafkaListener(topicPartitions = {@TopicPartition(topic = "kafka-topic", partitions = {"2"})})`
 - Retry Strategy:
-    - Establish a retry mechanism for Kafka messages. Define the maximum number of retries before routing undeliverable <br> messages to the `Dead Letter Topic` (DLT is a topic that store all the failed message)
+    - Establish a retry strategy for Producer when encountering an error during sending the message to Kafka broker <br>
+        - you just need to config below properties in Producer
+            - **retries:** setting determines how many times the producer will attempt to send a message before marking it as failed
+            - **delivery.timeout.ms:** Records will be failed if they can’t be delivered in `delivery.timeout.ms`
+            - **retry.backoff.ms:** the producer will wait `100ms` between retries, but you can control this using the `retry.backoff.ms` parameter
+            - **max.in.flight.requests.per.connection:** This setting basically controls how many requests can be made in parallel to any partition
+                - if we enable idempotence `enable.idempotence=true`, then it is required for `max.in.flight.requests.per.connection` to be less than or equal to 5
+            - **enable.idempotence**: Producer idempotence ensures that duplicates are not introduced due to unexpected retries.
+            - **ack**: Kafka producers must also specify a level of acknowledgment `acks` to specify if the message must be written to a minimum number of replicas before being considered a successful write.
+    - Establish a retry mechanism for Kafka messages at **Consumer side**. Define the maximum number of retries before routing undeliverable <br> messages to the `Dead Letter Topic` (DLT is a topic that store all the failed message)
     - It prevents lost message. (reliable message process)
     - You just need to add `@RetryableTopic` on top of your KafkaListener and also define a method that annotates with `@DltHandler`
         - `@RetryableTopic` is non-blocking approach and can improve performance

@@ -3,6 +3,14 @@ spring:
     name: error-handling
 server:
   port: 9191
+  shutdown: graceful
+logging:
+  level:
+    root: WARN
+    org.springframework.web: INFO
+    ir.bigz.kafka: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss}  [%thread] %-5level %logger{36} - %msg%n"
 
 app:
   topic:

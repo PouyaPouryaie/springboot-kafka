@@ -7,6 +7,7 @@ This project showcases how to leverage Apache Kafka with Spring Boot and Java ap
 - **Implementing Error Handling and Retry Strategies**: Ensure message delivery and data integrity by handling potential errors and retry mechanisms.
 - **Utilizing Avro and Schema Registry**: Enhance data management with Avro serialization and centralized schema management through Schema Registry.
 - **Advance Producer and Consumer**: Customization Producer and Consumer to more flexible for real project
+- **Idempotence & Exactly-Once Semantics (EOS)**: Ensuring data integrity and preventing duplicates
 
 This project empowers developers to gain practical knowledge of Kafka and its integration with Spring Boot Java applications.
 Getting Started

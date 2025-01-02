@@ -11,9 +11,4 @@ public class KafkaExceptionHandler {
     public ResponseEntity<?> publisherHandler(PublisherException e) {
         return ResponseEntity.internalServerError().body(e.getMessage());
     }
-
-    @ExceptionHandler(ConsumerException.class)
-    public ResponseEntity<?> consumerHandler(ConsumerException e) {
-        return ResponseEntity.internalServerError().body(e.getMessage());
-    }
 }

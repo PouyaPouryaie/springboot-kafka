@@ -41,6 +41,12 @@ public class KafkaConfigMap {
         propsMap.put(JsonDeserializer.TRUSTED_PACKAGES, "ir.bigz.kafka.dto");
         propsMap.put(ConsumerConfig.GROUP_ID_CONFIG, "kafka-error-group");
         propsMap.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+        propsMap.put(ProducerConfig.RETRIES_CONFIG, "3");
+        propsMap.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, "30000");
+        propsMap.put(ProducerConfig.RETRY_BACKOFF_MS_CONFIG, "1000");
+        propsMap.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true");
+        propsMap.put(ProducerConfig.ACKS_CONFIG, "all");
+        propsMap.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, "5"); // set it to One if you need Ordering
         return new KafkaConfigMap(propsMap);
     }
 
