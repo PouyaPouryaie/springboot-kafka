@@ -32,7 +32,7 @@ public class NonBlockingKafkaMessageConsumer {
             exclude = {NullPointerException.class}
 //            include = {SocketTimeoutException.class, IOException.class} // you just can use one of exclude or include simultaneously
     )
-    @KafkaListener(topics = "${kafka.properties.topic-name}", groupId = "kafka-error-group",
+    @KafkaListener(topics = "${kafka.properties.topic-name}",
             containerFactory = "defaultKafkaListenerContainerFactory")
     public void consumeEvents(User user,
                               @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,

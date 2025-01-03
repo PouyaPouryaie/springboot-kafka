@@ -84,7 +84,7 @@ public class KafkaConfigMap {
         propsMap.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         propsMap.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         propsMap.put(JsonDeserializer.TRUSTED_PACKAGES, kafkaProperties.getTrustedPackage());
-        propsMap.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaProperties.getDefaultConsumerGroupId());
+        propsMap.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaProperties.getConsumerGroupId());
         propsMap.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, kafkaProperties.getAutoOffsetReset());
         return propsMap;
     }

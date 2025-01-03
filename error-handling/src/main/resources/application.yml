@@ -26,6 +26,6 @@ kafka:
     acks: all
     max-in-flight-requests-per-connection: 5
     trusted-package: ir.bigz.kafka.dto
-    default-consumer-group-id: kafka-error-group
+    consumer-group-id: consume-non-blocking-group
     topic-name: kafka-error-handle
     auto-offset-reset: latest

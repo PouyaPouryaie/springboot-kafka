@@ -3,9 +3,13 @@ package ir.bigz.kafka.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Objects;
+
 @Configuration
-@ConfigurationProperties("kafka.properties")
+@ConfigurationProperties(KafkaProperties.PREFIX)
 public class KafkaProperties {
+
+    public static final String PREFIX = "kafka.properties";
 
     private String bootstrapServer;
     private String retries;
@@ -15,7 +19,7 @@ public class KafkaProperties {
     private String acks;
     private String maxInFlightRequestsPerConnection;
     private String trustedPackage;
-    private String defaultConsumerGroupId;
+    private String consumerGroupId;
     private String topicName;
     private String autoOffsetReset;
 
@@ -23,7 +27,7 @@ public class KafkaProperties {
     }
 
     public String getBootstrapServer() {
-        return bootstrapServer;
+        return Objects.requireNonNullElse(bootstrapServer, "localhost:9092");
     }
 
     public void setBootstrapServer(String bootstrapServer) {
@@ -86,16 +90,16 @@ public class KafkaProperties {
         this.trustedPackage = trustedPackage;
     }
 
-    public String getDefaultConsumerGroupId() {
-        return defaultConsumerGroupId;
+    public String getConsumerGroupId() {
+        return Objects.requireNonNullElse(consumerGroupId, "consumer-group-id");
     }
 
-    public void setDefaultConsumerGroupId(String defaultConsumerGroupId) {
-        this.defaultConsumerGroupId = defaultConsumerGroupId;
+    public void setConsumerGroupId(String consumerGroupId) {
+        this.consumerGroupId = consumerGroupId;
     }
 
     public String getTopicName() {
-        return topicName;
+        return Objects.requireNonNullElse(topicName, "kafka-topic");
     }
 
     public void setTopicName(String topicName) {

@@ -21,7 +21,7 @@ public class BlockingKafkaListener {
     Logger log = LoggerFactory.getLogger(BlockingKafkaListener.class);
 
     @KafkaListener(containerFactory = "kafkaCustomBlockingRetryContainerFactory",
-            topics = "${app.topic.custom.name}", groupId = "consumer-custom-group")
+            topics = "${app.topic.custom.name}", groupId = "consume-blocking-group")
     public void consumeEvents(User user,
                               @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
                               @Header(KafkaHeaders.OFFSET) long offset
