@@ -33,9 +33,9 @@ public class KafkaMessagePublisher {
         CompletableFuture<SendResult<String, Object>> future = template.send("message-string-topic", message);
         future.whenComplete((result, ex) -> {
             if (ex == null) {
-                log.info("Sent Message= {} to topic= {} with offset= {}", message, "message-string-topic",result.getRecordMetadata().offset());
+                onSuccess(result, message);
             } else {
-                log.error("Unable to send message= {} due to {}", message, ex.getMessage());
+                onFailure(ex, message);
             }
         });
     }
@@ -45,28 +45,40 @@ public class KafkaMessagePublisher {
             CompletableFuture<SendResult<String, Object>> future = template.send("message-string-topic", partition, null, message);
             future.whenComplete((result, ex) -> {
                 if (ex == null) {
-                    log.info("Sent Message= {} to topic= {} with offset= {} to partition= {}", message, "message-string-topic",result.getRecordMetadata().offset(), partition);
+                    onSuccess(result, message);
                 } else {
-                    log.error("Unable to send message= {} due to {}", message, ex.getMessage());
+                    onFailure(ex, message);
                 }
             });
         } else {
             log.error("Unable to send message= {} due to partition= {} doesn't exist", message, partition);
             throw new RuntimeException("Partition doesn't exist");
         }
-
     }
 
     public void sendMessageToTopic(Customer customer) {
         var customerMessage = new Message<>(customer);
         CompletableFuture<SendResult<String, Object>> future = template.send("message-customer-topic", customerMessage);
-        future.whenComplete((result, ex) -> {
-            if (ex == null) {
-                log.info("Sent Message= {} to topic= {} with offset= {}", customerMessage, "message-customer-topic", result.getRecordMetadata().offset());
-            } else {
-                log.error("Unable to send Message= {} due to {}", customerMessage, ex.getMessage());
-            }
-        });
+        future.thenAccept(result -> onSuccess(result, customerMessage))
+                .exceptionally(ex -> {
+                    onFailure(ex, customerMessage);
+                    return null;
+                });
+    }
+
+    private <T> void onSuccess(final SendResult<String, Object> result, final T t) {
+        log.info("Sent Message={} to topic-partition={}-{} with offset={}",
+                t.toString(),
+                result.getRecordMetadata().topic(),
+                result.getRecordMetadata().partition(),
+                result.getRecordMetadata().offset());
+    }
+
+    private <T> void onFailure(final Throwable ex, final T t) {
+        log.error("Unable to send message={} due to {}",
+                t.toString(),
+                ex.getMessage());
+
     }
 
     private boolean partitionExists(String topic, int partition) {
