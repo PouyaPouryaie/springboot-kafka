@@ -11,8 +11,12 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.RetryableTopic;
 import org.springframework.kafka.retrytopic.DltStrategy;
 import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.kafka.support.converter.ConversionException;
+import org.springframework.kafka.support.serializer.DeserializationException;
+import org.springframework.messaging.converter.MessageConversionException;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.invocation.MethodArgumentResolutionException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +33,12 @@ public class NonBlockingKafkaMessageConsumer {
             attempts = "4",
             backoff = @Backoff(delay = 3000, multiplier = 1.5, maxDelay = 15000),
             dltStrategy = DltStrategy.FAIL_ON_ERROR,
-            exclude = {NullPointerException.class}
+            exclude = {DeserializationException.class,
+                    MessageConversionException.class,
+                    ConversionException.class,
+                    MethodArgumentResolutionException.class,
+                    NoSuchMethodException.class,
+                    ClassCastException.class}
 //            include = {SocketTimeoutException.class, IOException.class} // you just can use one of exclude or include simultaneously
     )
     @KafkaListener(topics = "${kafka.properties.topic-name}",
