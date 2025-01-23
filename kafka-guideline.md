@@ -292,13 +292,21 @@ docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-topics.sh \
     - You just need to add `@RetryableTopic` on top of your KafkaListener and also define a method that annotates with `@DltHandler`
         - `@RetryableTopic` is non-blocking approach and can improve performance
         - but there are some disadvantage like change order of a message or risk of message duplication
+        - `retryTopicSuffix`: You can give the suffix yourself when naming the retry topic
+        - `TopicSuffixingStrategy.SUFFIX_WITH_INDEX_VALUE` -> If this value is given, 1 retry topics will be created as {topic_name}-retry-0
+        - `dltTopicSuffix` -> you can give suffix to your dlt topic. if you give the value as “-dead-t”, it will be created as {topic_name}-dead-t.
         - There are Three strategy for DLT
             - `FAIL_ON_ERROR`: strategy when the DLT consumer won’t try to reprocess an event in case of failure
             - `ALWAYS_RETRY_ON_ERROR`: strategy ensures that the DLT consumer tries to reprocess the event in case of failure
             - `No_DLT`: strategy, which turns off the DLT mechanism altogether
         ```Java
         // Config dlt strategy at Retryable
-        @RetryableTopic(attempts = "1",dltStrategy = DltStrategy.FAIL_ON_ERROR)
+        @RetryableTopic(
+                attempts = "1",
+                dltStrategy = DltStrategy.FAIL_ON_ERROR,
+                topicSuffixingStrategy = TopicSuffixingStrategy.SUFFIX_WITH_INDEX_VALUE,
+                retryTopicSuffix = "-custom-try",
+                dltTopicSuffix = "-dead-t")
         @KafkaListener(topics = "topic-name", groupId = "kafka-error-group")
         public void consumeEvents(Payload data){
             // put logic here

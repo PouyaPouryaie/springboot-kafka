@@ -16,6 +16,8 @@ app:
   topic:
     custom:
       name: kafka-blocking-retry
+  restricted:
+    ips: "32.241.244.236,15.55.49.164,81.1.95.253,126.130.43.183"
 kafka:
   properties:
     bootstrap-server: 172.21.0.2:9092
