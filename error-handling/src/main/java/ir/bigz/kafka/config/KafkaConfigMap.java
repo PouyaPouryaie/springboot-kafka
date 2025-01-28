@@ -9,9 +9,7 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Component
 @EnableConfigurationProperties(KafkaProperties.class)
@@ -22,10 +20,9 @@ public class KafkaConfigMap {
 
     public KafkaConfigMap(KafkaProperties kafkaProperties) {
         this.kafkaProperties = kafkaProperties;
-        kafkaConfigs = Map.of(
-                KafkaType.PRODUCER, getDefaultKafkaProducerConfig(),
-                KafkaType.CONSUMER, getDefaultKafkaConsumerConfig()
-        );
+        kafkaConfigs = new EnumMap<>(KafkaType.class);
+        kafkaConfigs.put(KafkaType.PRODUCER, Collections.synchronizedMap(getDefaultKafkaProducerConfig()));
+        kafkaConfigs.put(KafkaType.CONSUMER, Collections.synchronizedMap(getDefaultKafkaConsumerConfig()));
     }
 
     public enum KafkaType {
@@ -34,9 +31,10 @@ public class KafkaConfigMap {
 
 
     public Map<String, Object> getKafkaConfig(KafkaType kafkaType) {
+        Objects.requireNonNull(kafkaType, "KafkaType cannot be null");
 
         return switch (kafkaType) {
-            case PRODUCER, CONSUMER -> this.kafkaConfigs.get(kafkaType);
+            case PRODUCER, CONSUMER -> Collections.unmodifiableMap(kafkaConfigs.get(kafkaType));
             default -> throw new IllegalArgumentException("Invalid KafkaType: " + kafkaType);
         };
     }
@@ -58,8 +56,18 @@ public class KafkaConfigMap {
     }
 
     private void updateConfig(KafkaType kafkaType, String key, Object value) {
-        if(Objects.nonNull(key) && Objects.nonNull(value)) {
-            this.kafkaConfigs.get(kafkaType).put(key, value);
+
+        Objects.requireNonNull(kafkaType, "KafkaType cannot be null");
+        Objects.requireNonNull(key, "Configuration key cannot be null");
+        Objects.requireNonNull(value, "Configuration value cannot be null");
+
+        Map<String, Object> config = kafkaConfigs.get(kafkaType);
+        if (config != null) {
+            synchronized (config) {
+                config.put(key, value);
+            }
+        } else {
+            throw new IllegalArgumentException("Invalid KafkaType: " + kafkaType);
         }
     }
 
