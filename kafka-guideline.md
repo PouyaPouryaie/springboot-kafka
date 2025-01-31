@@ -190,6 +190,7 @@ docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-topics.sh \
 
 - The Spring application is capable of dynamically provisioning new Kafka topics with default configurations (partition 1, replication 0),<br> this action happens when a message and topicName send to kafka with `kafkaTemplate`
 - Create Topic Programmatically: defining a bean from NewTopic and set name, partition, and replication for the topic
+- **KafkaAdmin**: It is a class in the Spring Kafka library that provides a convenient way to perform administrative operations on <br> a Kafka cluster. It simplifies tasks like **creating, deleting, and configuring** topics
 - For consuming, you should define a group for consumer
     - by annotation: `@KafkaListener(topics = "kafka-spring-topic", groupId = "spring-group")`
         - This annotation could be used on top of class or method

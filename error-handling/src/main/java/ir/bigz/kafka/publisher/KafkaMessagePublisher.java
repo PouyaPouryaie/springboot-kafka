@@ -4,6 +4,8 @@ import ir.bigz.kafka.config.KafkaProperties;
 import ir.bigz.kafka.dto.User;
 import ir.bigz.kafka.exception.PublisherException;
 import ir.bigz.kafka.utils.CsvReaderUtils;
+import org.apache.kafka.common.errors.RetriableException;
+import org.apache.kafka.common.errors.SerializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -53,7 +55,7 @@ public class KafkaMessagePublisher {
                 if (ex == null) {
                     onSuccess(result, message);
                 } else {
-                    onFailure(ex, message);
+                    handleException(ex, message, targetTopic);
                 }
             });
         } catch (Exception ex) {
@@ -89,7 +91,7 @@ public class KafkaMessagePublisher {
      * @param result the result of the publish operation
      * @param t      the message payload
      */
-    private static <T> void onSuccess(final SendResult<String, Object> result, final T t) {
+    private <T> void onSuccess(final SendResult<String, Object> result, final T t) {
         log.info("Successfully send message=[{}] to topic-partition={}-{} with offset={}",
                 t,
                 result.getRecordMetadata().topic(),
@@ -98,12 +100,33 @@ public class KafkaMessagePublisher {
     }
 
     /**
-     * Handles failed message publishing.
+     * Handles exception message publishing.
      *
      * @param ex the exception that occurred
-     * @param t  the message payload
+     * @param payload the message payload
      */
-    private static <T> void onFailure(Throwable ex, final T t) {
-        log.error("unable to send message=[{}] Error: {}", t, ex.getMessage(), ex);
+    private <T> void handleException(Throwable ex, final T payload, final String targetTopic) {
+
+        if(ex.getCause() instanceof RetriableException) {
+            log.warn("Retriable exception occurred. Kafka will retry automatically: {}", ex.getMessage());
+        } else if (ex.getCause() instanceof SerializationException) {
+            log.error("Serialization error! message=[{}]", payload);
+        } else {
+            log.error("Non-Retriable exception occurred. Sending message to dead-letter queue: [{}] Error: {}", payload, ex.getMessage());
+            sendToDeadLetterTopic(payload, targetTopic);
+        }
+
+    }
+
+    /**
+     * Sending Non-Retriable exception to DLT Queue.
+     *
+     * @param topic the DLT name
+     * @param payload  the message payload
+     */
+    private <T> void sendToDeadLetterTopic(T payload, final String topic) {
+        String deadLetterTopic = topic + ".DLT";
+        log.info("Sending failed message to Dead Letter Topic: {}", deadLetterTopic);
+        kafkaTemplate.send(deadLetterTopic, payload);
     }
 }
