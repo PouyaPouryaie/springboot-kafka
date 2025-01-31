@@ -5,6 +5,7 @@ import ir.bigz.kafka.exception.ConsumerException;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
@@ -37,9 +38,28 @@ public class kafkaConfig {
         this.kafkaProperties = kafkaProperties;
     }
 
+    @Value("${app.topic.custom.name}")
+    private String retryBlockTopicName;
+
     @Bean
-    public NewTopic createTopicWithTopicBuilder() {
+    public NewTopic createTopic() {
         return TopicBuilder.name(kafkaProperties.getTopicName())
+                .partitions(3)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
+    public NewTopic createDefaultDltTopic() {
+        return TopicBuilder.name(kafkaProperties.getTopicName() + ".DLT")
+                .partitions(3)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
+    public NewTopic createDltTopicForBlocking() {
+        return TopicBuilder.name(retryBlockTopicName + ".DLT")
                 .partitions(3)
                 .replicas(1)
                 .build();
