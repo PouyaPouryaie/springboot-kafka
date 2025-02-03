@@ -4,8 +4,7 @@ import ir.bigz.kafka.config.KafkaProperties;
 import ir.bigz.kafka.dto.User;
 import ir.bigz.kafka.exception.PublisherException;
 import ir.bigz.kafka.utils.CsvReaderUtils;
-import org.apache.kafka.common.errors.RetriableException;
-import org.apache.kafka.common.errors.SerializationException;
+import org.apache.kafka.common.errors.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -107,15 +106,16 @@ public class KafkaMessagePublisher {
      */
     private <T> void handleException(Throwable ex, final T payload, final String targetTopic) {
 
-        if(ex.getCause() instanceof RetriableException) {
-            log.warn("Retriable exception occurred. Kafka will retry automatically: {}", ex.getMessage());
-        } else if (ex.getCause() instanceof SerializationException) {
-            log.error("Serialization error! message=[{}]", payload);
-        } else {
+        if (ex instanceof UnsupportedVersionException
+                || ex instanceof RecordTooLargeException
+                || ex instanceof CorruptRecordException) {
             log.error("Non-Retriable exception occurred. Sending message to dead-letter queue: [{}] Error: {}", payload, ex.getMessage());
             sendToDeadLetterTopic(payload, targetTopic);
+        } else if (ex instanceof SerializationException) {
+            log.error("Serialization error! message=[{}]", payload);
+        } else if (ex instanceof RetriableException) {
+            log.warn("Retriable exception occurred. Kafka will retry automatically: {}", ex.getMessage());
         }
-
     }
 
     /**
