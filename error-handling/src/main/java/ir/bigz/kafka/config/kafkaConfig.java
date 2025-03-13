@@ -103,12 +103,6 @@ public class kafkaConfig {
         int attempts = 3;
         BackOff backOff = new FixedBackOff(1000, attempts);
 
-        //simple Custom Error Handler
-//        final DefaultErrorHandler customErrorHandler = new DefaultErrorHandler((consumerRecord, exception) -> {
-//            // put your logic to execute when all the retry attempts are exhausted
-//            log.error(" Received: {} , after {} attempts, exception: {}", consumerRecord.value(), attempts, exception.getMessage());
-//        }, backOff);
-
         // Dead Letter Publishing Recoverer: Sends messages to DLT after max retries
         final DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(kafkaTemplate,
                 (consumerRecord, ex) -> {
