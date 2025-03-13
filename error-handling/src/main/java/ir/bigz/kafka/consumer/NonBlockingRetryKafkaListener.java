@@ -68,15 +68,27 @@ public class NonBlockingRetryKafkaListener {
         log.info("Received message: {}  from topic: {} offset: {}", serializeUser(user), topic, offset);
 
         //validate restricted IP before process the records
-        if (isRestrictedIp(user.getIpAddress())) {
-            String errorMessage = String.format("Invalid IP [%s] received at topic [%s], offset [%d]",
-                    user.getIpAddress(), topic, offset);
-            log.warn(errorMessage);
-            throw new ConsumerException(errorMessage, topic, offset);
-        }
+        validateIp(user.getIpAddress(), topic, offset);
 
         // Add further processing logic hereNonBlockingKafkaMessageConsumer
         log.info("Message successfully processed for user ID: {}", user.getId());
+    }
+
+    /**
+     * Validates whether the given IP address is restricted.
+     *
+     * @param ipAddress The IP address to validate.
+     * @param topic     The Kafka topic from which the message was received.
+     * @param offset    The offset of the message in the topic.
+     * @throws ConsumerException if the IP address is restricted.
+     */
+    private void validateIp(String ipAddress, String topic, long offset) {
+        if (restrictedIpList.contains(ipAddress)) {
+            String errorMessage = String.format("Restricted IP [%s] received from topic [%s], offset [%d]",
+                    ipAddress, topic, offset);
+            log.warn(errorMessage);
+            throw new ConsumerException(errorMessage, topic, offset);
+        }
     }
 
     /**
@@ -97,7 +109,7 @@ public class NonBlockingRetryKafkaListener {
      * Serializes the User object to a JSON string.
      *
      * @param user the user object
-     * @return a JSON string representation of the user
+     * @return A JSON string representation of the user or "Serialization Error" if serialization fails.
      */
     private String serializeUser(User user) {
         try {
@@ -106,15 +118,5 @@ public class NonBlockingRetryKafkaListener {
             log.error("Failed to serialize User object: {}", e.getMessage(), e);
             return "Serialization Error";
         }
-    }
-
-    /**
-     * Checks if the given IP address is restricted.
-     *
-     * @param ipAddress the IP address to validate
-     * @return true if the IP is restricted, false otherwise
-     */
-    private boolean isRestrictedIp(String ipAddress) {
-        return restrictedIpList.contains(ipAddress);
     }
 }
