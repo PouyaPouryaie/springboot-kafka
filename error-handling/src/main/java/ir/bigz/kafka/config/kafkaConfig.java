@@ -33,7 +33,7 @@ import java.io.IOException;
 @EnableKafka
 public class kafkaConfig {
 
-    Logger log = LoggerFactory.getLogger(kafkaConfig.class);
+    private static final Logger log = LoggerFactory.getLogger(kafkaConfig.class);
 
     private final KafkaConfigMap kafkaConfigMap;
     private final KafkaProperties kafkaProperties;
@@ -43,11 +43,8 @@ public class kafkaConfig {
         this.kafkaProperties = kafkaProperties;
     }
 
-    @Value("${app.topic.custom.name}")
-    private String retryBlockTopicName;
-
     @Bean
-    public NewTopic createTopic() {
+    public NewTopic mainTopic() {
         return TopicBuilder.name(kafkaProperties.getTopicName())
                 .partitions(3)
                 .replicas(1)
@@ -55,20 +52,12 @@ public class kafkaConfig {
     }
 
     @Bean
-    public NewTopic createDefaultDltTopic() {
+    public NewTopic deadLetterTopic() {
         return TopicBuilder.name(kafkaProperties.getTopicName() + ".DLT")
                 .partitions(3)
                 .replicas(1)
                 .build();
     }
-
-//    @Bean
-//    public NewTopic createDltTopicForBlocking() {
-//        return TopicBuilder.name(retryBlockTopicName + ".DLT")
-//                .partitions(3)
-//                .replicas(1)
-//                .build();
-//    }
 
     @Bean
     public ProducerFactory<String, Object> producerFactory() {
@@ -86,6 +75,7 @@ public class kafkaConfig {
         return new DefaultKafkaConsumerFactory<>(kafkaConfigMap.getKafkaConfig(KafkaType.CONSUMER));
     }
 
+    // Default Kafka Listener Factory
     @Bean
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Object>> defaultKafkaListenerContainerFactory
             (ConsumerFactory<String, Object> consumerFactory) {
@@ -94,11 +84,12 @@ public class kafkaConfig {
         return factory;
     }
 
+    // Kafka Listener with Custom Error Handling and Retry
     @Bean
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Object>> kafkaCustomErrorRetryContainerFactory
             (ConsumerFactory<String, Object> consumerFactory, DefaultErrorHandler defaultErrorHandler) {
         ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConcurrency(1);
+        factory.setConcurrency(1); // Ensures sequential message processing per partition
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE); // (Use AckMode.MANUAL_IMMEDIATE when setSeekAfterError(false), and you should manually call ack mode for successful processing)
 //        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
         factory.setCommonErrorHandler(defaultErrorHandler);
@@ -106,6 +97,7 @@ public class kafkaConfig {
         return factory;
     }
 
+    // Custom Error Handler with Retry and Dead Letter Publishing
     @Bean
     public DefaultErrorHandler customErrorHandler(KafkaTemplate<String, Object> kafkaTemplate) {
         int attempts = 3;
@@ -117,19 +109,24 @@ public class kafkaConfig {
 //            log.error(" Received: {} , after {} attempts, exception: {}", consumerRecord.value(), attempts, exception.getMessage());
 //        }, backOff);
 
-        // Define Dead Letter Publishing Recoverer
+        // Dead Letter Publishing Recoverer: Sends messages to DLT after max retries
         final DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(kafkaTemplate,
                 (consumerRecord, ex) -> {
-                    log.error(" Received: {} , after {} attempts, exception: {}", consumerRecord.value(), attempts, ex.getMessage());
+                    log.error(" Received: {} , after {} attempts, exception: {}",
+                            consumerRecord.value(), attempts, ex.getMessage());
                     return new TopicPartition(consumerRecord.topic() + ".DLT", consumerRecord.partition());
                 });
 
         final DefaultErrorHandler customErrorHandler = new DefaultErrorHandler(recoverer, backOff);
 
+        // Configure retryable and non-retryable exceptions
         customErrorHandler.addRetryableExceptions(IOException.class, ConsumerException.class);
         customErrorHandler.addNotRetryableExceptions(NullPointerException.class);
-        customErrorHandler.setSeekAfterError(false); // Prevent seeking to the failed record
-        customErrorHandler.setCommitRecovered(true); // Commit offsets for failed records after retries are exhausted
+
+        // Set error handling behavior
+        customErrorHandler.setSeekAfterError(false); // Prevents re-seeking failed records
+        customErrorHandler.setCommitRecovered(true); // Ensures committed offsets for failed records
+
         return customErrorHandler;
     }
 }
