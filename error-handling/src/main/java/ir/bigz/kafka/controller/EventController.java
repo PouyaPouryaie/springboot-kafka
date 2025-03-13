@@ -23,7 +23,7 @@ public class EventController {
     KafkaMessagePublisher kafkaMessagePublisher;
 
     @Value("${app.topic.custom.name}")
-    private String retryBlockTopicName;
+    private String customErrorHandlerTopicName;
 
     public EventController(KafkaMessagePublisher kafkaMessagePublisher) {
         this.kafkaMessagePublisher = kafkaMessagePublisher;
@@ -49,7 +49,7 @@ public class EventController {
      *
      * @return a response indicating the request was accepted
      */
-    @GetMapping("/retry-non-blocking")
+    @GetMapping("/")
     public ResponseEntity<?> publishBulkMessage() {
         log.info("Received request to publish bulk messages to default topic");
 
@@ -60,17 +60,33 @@ public class EventController {
     }
 
     /**
-     * Publishes messages from a CSV file to a specific Kafka topic (blocking retry).
+     * Publishes a single message to the custom-error topic.
+     *
+     * @param user the user payload
+     * @return a response indicating success
+     */
+    @PostMapping("/custom-error-handler")
+    public ResponseEntity<?> publishMessageForCustomErrorHandlerTopic(@RequestBody User user) {
+        log.info("Received request to publish to custom-error-handler Topic message: {}", user);
+
+        kafkaMessagePublisher.send(user, Optional.of(customErrorHandlerTopicName));
+        return ResponseEntity.status(HttpStatus.ACCEPTED)
+                .body(new ApiResponse("Message published for custom-error-handler topic",
+                        HttpStatus.ACCEPTED.value()));
+    }
+
+    /**
+     * Publishes messages from a CSV file to a specific Kafka topic (custom-error-handler topic).
      *
      * @return a response indicating the request was accepted
      */
-    @GetMapping("/retry-blocking")
-    public ResponseEntity<?> publishBulkMessageForRetryBlock() {
-        log.info("Received request to publish bulk messages to retry-block topic: {}", retryBlockTopicName);
+    @GetMapping("/custom-error-handler")
+    public ResponseEntity<?> publishBulkMessageForCustomErrorHandlerTopic() {
+        log.info("Received request to publish bulk messages to custom-error-handler topic: {}", customErrorHandlerTopicName);
 
-        kafkaMessagePublisher.sendCSVFile(Optional.of(retryBlockTopicName));
+        kafkaMessagePublisher.sendCSVFile(Optional.of(customErrorHandlerTopicName));
         return ResponseEntity.status(HttpStatus.ACCEPTED)
-                .body(new ApiResponse("Bulk messages publishing initiated for retry-block topic",
+                .body(new ApiResponse("Bulk messages publishing initiated for custom-error-handler topic",
                         HttpStatus.ACCEPTED.value()));
     }
 

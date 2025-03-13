@@ -15,7 +15,7 @@ logging:
 app:
   topic:
     custom:
-      name: kafka-blocking-retry
+      name: custom-error-handler
   restricted:
     ips: "32.241.244.236,15.55.49.164,81.1.95.253,126.130.43.183"
 kafka:
@@ -29,5 +29,5 @@ kafka:
     max-in-flight-requests-per-connection: 5
     trusted-package: ir.bigz.kafka.dto
     consumer-group-id: consume-non-blocking-group
-    topic-name: kafka-error-handle
+    topic-name: kafka-error-handler
     auto-offset-reset: latest

@@ -27,14 +27,14 @@ import java.util.Set;
  * Kafka consumer for non-blocking retry processing.
  */
 @Service
-public class NonBlockingKafkaMessageConsumer {
+public class NonBlockingRetryKafkaListener {
 
-    private final static Logger log = LoggerFactory.getLogger(NonBlockingKafkaMessageConsumer.class);
+    private final static Logger log = LoggerFactory.getLogger(NonBlockingRetryKafkaListener.class);
     private final ObjectMapper objectMapper;
     private final Set<String> restrictedIpList;
 
-    public NonBlockingKafkaMessageConsumer(ObjectMapper objectMapper,
-                                           @Value("${app.restricted.ips}") Set<String> restrictedIpList) {
+    public NonBlockingRetryKafkaListener(ObjectMapper objectMapper,
+                                         @Value("${app.restricted.ips}") Set<String> restrictedIpList) {
         this.objectMapper = objectMapper;
         this.restrictedIpList = restrictedIpList;
     }
@@ -75,7 +75,7 @@ public class NonBlockingKafkaMessageConsumer {
             throw new ConsumerException(errorMessage, topic, offset);
         }
 
-        // Add further processing logic here
+        // Add further processing logic hereNonBlockingKafkaMessageConsumer
         log.info("Message successfully processed for user ID: {}", user.getId());
     }
 
