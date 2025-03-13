@@ -3,11 +3,10 @@ package ir.bigz.kafka.config;
 import ir.bigz.kafka.config.KafkaConfigMap.KafkaType;
 import ir.bigz.kafka.exception.ConsumerException;
 import org.apache.kafka.clients.admin.NewTopic;
-import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -27,18 +26,20 @@ import org.springframework.util.backoff.BackOff;
 import org.springframework.util.backoff.FixedBackOff;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Configuration(proxyBeanMethods = false)
 @EnableKafka
-public class kafkaConfig {
+public class KafkaConfig {
 
-    private static final Logger log = LoggerFactory.getLogger(kafkaConfig.class);
+    private static final Logger log = LoggerFactory.getLogger(KafkaConfig.class);
 
     private final KafkaConfigMap kafkaConfigMap;
     private final KafkaProperties kafkaProperties;
 
-    public kafkaConfig(KafkaConfigMap kafkaConfigMap, KafkaProperties kafkaProperties) {
+    public KafkaConfig(KafkaConfigMap kafkaConfigMap, KafkaProperties kafkaProperties) {
         this.kafkaConfigMap = kafkaConfigMap;
         this.kafkaProperties = kafkaProperties;
     }
@@ -79,7 +80,9 @@ public class kafkaConfig {
     @Bean
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Object>> defaultKafkaListenerContainerFactory
             (ConsumerFactory<String, Object> consumerFactory) {
+
         ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
         factory.setConsumerFactory(consumerFactory);
         return factory;
     }
@@ -101,7 +104,7 @@ public class kafkaConfig {
     @Bean
     public DefaultErrorHandler customErrorHandler(KafkaTemplate<String, Object> kafkaTemplate) {
         int attempts = 3;
-        BackOff backOff = new FixedBackOff(1000, attempts);
+        BackOff backOff = new FixedBackOff(2000, attempts);
 
         // Dead Letter Publishing Recoverer: Sends messages to DLT after max retries
         final DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(kafkaTemplate,
@@ -111,7 +114,7 @@ public class kafkaConfig {
                     return new TopicPartition(consumerRecord.topic() + ".DLT", consumerRecord.partition());
                 });
 
-        final DefaultErrorHandler customErrorHandler = new DefaultErrorHandler(recoverer, backOff);
+        DefaultErrorHandler customErrorHandler = new DefaultErrorHandler(recoverer, backOff);
 
         // Configure retryable and non-retryable exceptions
         customErrorHandler.addRetryableExceptions(IOException.class, ConsumerException.class);

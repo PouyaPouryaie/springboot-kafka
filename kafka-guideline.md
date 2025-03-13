@@ -149,6 +149,10 @@ kafka-console-consumer.sh --bootstrap-server localhost:9092 \
 --value-deserializer org.apache.kafka.common.serialization.StringDeserializer \
 --key-deserializer org.apache.kafka.common.serialization.StringDeserializer
 ```
+- If you want to reset consumer group offset to the latest
+```bash
+kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group <cunsomer-group> --reset-offsets --to-latest --all-topics --execute
+```
 
 ## Kafka configs
 - To update a Kafka topic's configuration (e.g., retention settings, number of partitions), use the `kafka-configs.sh` tool.

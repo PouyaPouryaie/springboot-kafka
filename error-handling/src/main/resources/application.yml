@@ -31,3 +31,4 @@ kafka:
     consumer-group-id: consume-non-blocking-group
     topic-name: kafka-error-handler
     auto-offset-reset: latest
+    enable-auto-commit: false

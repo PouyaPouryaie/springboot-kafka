@@ -94,6 +94,7 @@ public class KafkaConfigMap {
         propsMap.put(JsonDeserializer.TRUSTED_PACKAGES, kafkaProperties.getTrustedPackage());
         propsMap.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaProperties.getConsumerGroupId());
         propsMap.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, kafkaProperties.getAutoOffsetReset());
+        propsMap.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, kafkaProperties.getEnableAutoCommit());
         return propsMap;
     }
 

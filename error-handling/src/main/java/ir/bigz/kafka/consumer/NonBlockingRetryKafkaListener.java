@@ -49,8 +49,9 @@ public class NonBlockingRetryKafkaListener {
      */
     @RetryableTopic(
             attempts = "4",
-            backoff = @Backoff(delay = 3000, multiplier = 1.5, maxDelay = 15000),
+            backoff = @Backoff(delay = 5000, multiplier = 1.5, maxDelay = 15000),
             dltStrategy = DltStrategy.FAIL_ON_ERROR,
+            dltTopicSuffix = ".DLT",
             exclude = {DeserializationException.class,
                     MessageConversionException.class,
                     ConversionException.class,

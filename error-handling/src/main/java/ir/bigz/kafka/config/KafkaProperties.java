@@ -22,6 +22,7 @@ public class KafkaProperties {
     private String consumerGroupId;
     private String topicName;
     private String autoOffsetReset;
+    private String enableAutoCommit;
 
     public KafkaProperties() {
     }
@@ -112,5 +113,13 @@ public class KafkaProperties {
 
     public void setAutoOffsetReset(String autoOffsetReset) {
         this.autoOffsetReset = autoOffsetReset;
+    }
+
+    public String getEnableAutoCommit() {
+        return Objects.requireNonNullElse(enableAutoCommit, "true");
+    }
+
+    public void setEnableAutoCommit(String enableAutoCommit) {
+        this.enableAutoCommit = enableAutoCommit;
     }
 }
