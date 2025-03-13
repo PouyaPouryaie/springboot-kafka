@@ -313,6 +313,20 @@ docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-topics.sh \
             // put logic here
         } 
         ```
+    - **Custom Error Handler**  
+      - Another Approach is to define a custom error handler, `DefaultErrorHandler` and inject it into The `ConcurrentKafkaListenerContainerFactory` as a global error handler.
+      - `seekAfterError` property: allows you to control whether the consumer seeks back to the offset of the failed record or retains unprocessed records for resubmission after an error, providing flexibility in handling message redelivery scenarios
+        - By default, when an error happens during message processing, the `DefaultErrorHandler` seeks the consumer back to the offset of the failed record, causing it and any subsequent unprocessed records to be redelivered.
+          - This behavior ensures that messages are reprocessed in the correct order.
+        - If you use `setSeekAfterError(false)`, then you must use `AckMode.MANUAL_IMMEDIATE`.
+          - Manually call `ack.acknowledge();` only after successful processing to ensure the offset is committed.
+      - `setCommitRecovered(true)`: allows the successful offset commit of records that were previously retried and recovered. This ensures that the consumer does not reprocess messa.ges that have already been handled by the error handler
+        - the offset is committed for recovered (skipped or sent to DLT) records, preventing reprocessing
+        - Recommended when using Dead Letter Topics (DLT).
+      - Use Cases for `DefaultErrorHandler`:
+        - Situations where you want to retry message processing a few times and then ignore the message if it continues to fail.
+        - Scenarios where the order of messages is not critical.
+        - When you want to prevent indefinitely retrying a message that is fundamentally unprocessable.
 - Schema Registry (Avro Schema)
     - to ensure that new data can be consumed by older consumers that were designed to work with the old schema
     - the requirements which we need are an Avro Maven plugin to define object from Avro Schema file, <br> and Avro Serializer and Deserializer for serialize and deserialize
@@ -375,11 +389,12 @@ docker exec -it kafka-sample /opt/bitnami/kafka/bin/kafka-topics.sh \
         1. `Auto-commit`, 2. `After-processing`, 3. `Manual`
     - Several ack modes available that we can configure:
 
-        1. AckMode.RECORD: In this after-processing mode, the consumer sends an acknowledgment for each message it processes.
-        2. AckMode.BATCH: In this manual mode, the consumer sends an acknowledgment for a batch of messages, rather than for each message.
-        3. AckMode.COUNT: In this manual mode, the consumer sends an acknowledgment after it has processed a specific number of messages.
-        4. AckMode.MANUAL: In this manual mode, the consumer doesn’t send an acknowledgment for the messages it processes.
-        5. AckMode.TIME: In this manual mode, the consumer sends an acknowledgment after a certain amount of time has passed.
+        1. `AckMode.RECORD`: In this after-processing mode, the consumer sends an acknowledgment for each message it processes, whether it was successful or failed.
+        2. `AckMode.BATCH`: In this manual mode, the consumer sends an acknowledgment for a batch of messages, rather than for each message.
+        3. `AckMode.COUNT`: In this manual mode, the consumer sends an acknowledgment after it has processed a specific number of messages.
+        4. `AckMode.MANUA`L: In this manual mode, the consumer doesn’t send an acknowledgment for the messages it processes.
+        5. `AckMode.TIME`: In this manual mode, the consumer sends an acknowledgment after a certain amount of time has passed.
+        6. `AckMode.MANUAL_IMMEDIATE`: Like MANUAL, but commits immediately instead of waiting for the listener to finish.
     ```Java
         @Bean
         public ConcurrentKafkaListenerContainerFactory<String, Object> greetingKafkaListenerContainerFactory() {
