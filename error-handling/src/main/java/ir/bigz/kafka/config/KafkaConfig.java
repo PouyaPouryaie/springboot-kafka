@@ -3,7 +3,6 @@ package ir.bigz.kafka.config;
 import ir.bigz.kafka.config.KafkaConfigMap.KafkaType;
 import ir.bigz.kafka.exception.ConsumerException;
 import org.apache.kafka.clients.admin.NewTopic;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,16 +17,14 @@ import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
-import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.util.backoff.BackOff;
 import org.springframework.util.backoff.FixedBackOff;
 
 import java.io.IOException;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 
 @Configuration(proxyBeanMethods = false)
@@ -121,7 +118,6 @@ public class KafkaConfig {
         customErrorHandler.addNotRetryableExceptions(NullPointerException.class);
 
         // Set error handling behavior
-        customErrorHandler.setSeekAfterError(false); // Prevents re-seeking failed records
         customErrorHandler.setCommitRecovered(true); // Ensures committed offsets for failed records
 
         return customErrorHandler;
